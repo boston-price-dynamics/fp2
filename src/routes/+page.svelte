@@ -15,7 +15,7 @@
   let radiusScale;
   let opacityScale;
 
-  let yearFilter = 1900;
+  let yearFilter = 1950;
 
   function getCoords(property) {
     let point = new mapboxgl.LngLat(+property.lon, +property.lat);
@@ -48,16 +48,19 @@
   $: map?.on("move", (evt) => mapViewChanged++);
 
   $: filteredProperties =
-    yearFilter === 1900
+    yearFilter === 1950
       ? properties
       : properties.filter((property) => {
           return property.YR_BUILT <= yearFilter;
         });
 
   $: opacityScale = d3
-    .scaleLinear()
-    .domain([1900, yearFilter === 1900 ? 2024 : yearFilter])
-    .range([0.1, 0.7]);
+    .scalePow(3)
+    .domain([
+      yearFilter === 1950 ? 1850 : yearFilter - 100,
+      yearFilter === 1950 ? 2024 : yearFilter,
+    ])
+    .range([0.05, 0.75]);
 
   $: hoverSignals = filteredProperties?.map(() => false);
   $: hoverColors = filteredProperties?.map(() => "#FFBB05");
@@ -109,7 +112,10 @@
       });
 
     properties = properties.filter((property) => {
-      return property.totalValue > 100_000_000;
+      return (
+        property.totalValue > 100_000_000 &&
+        property.totalValue / property.totalUnits > 1_000_000
+      );
     });
     console.log(properties);
 
@@ -127,13 +133,16 @@
 </nav>
 <header>
   <div>
-    <h4>Boston Luxury Developments</h4>
+    <h4>
+      Boston Luxury Developments (Total Assessed Value > $10m, Average Assessed
+      Value > $1m)
+    </h4>
     <p>Assessed Values</p>
   </div>
   <label>
     Year:
-    <input type="range" min="1900" max="2024" bind:value={yearFilter} />
-    {#if yearFilter === 1900}
+    <input type="range" min="1950" max="2024" bind:value={yearFilter} />
+    {#if yearFilter === 1950}
       <em>(any year)</em>
     {:else}
       <year>{yearFilter}</year>
@@ -148,9 +157,12 @@
           {...getCoords(property)}
           r={radiusScale(property.totalValue)}
           fill={hoverColors[index]}
-          fill-opacity={opacityScale(property.YR_BUILT)}
+          fill-opacity={hoverSignals[index]
+            ? 0.8
+            : opacityScale(property.YR_BUILT)}
           stroke="white"
           on:mouseover={() => handleMouseOver(index)}
+          on:mouseleave={() => handleMouseOver(-1)}
         >
         </circle>
       {/each}
@@ -161,17 +173,31 @@
         {#if hoverSignals[index] === true}
           <rect
             {...getTextCoords(property)}
-            width="200"
-            height="60"
+            width="250"
+            height="120"
             fill="rgba(0,0,0,0.8)"
           >
           </rect>
           <text {...getTextCoords(property)} fill="#fff">
             <tspan {...getTextCoords(property)} dx="1em" dy="2em"
+              >{property.ST_NUM} {property.ST_NAME}, {property.CITY}</tspan
+            >
+            <tspan {...getTextCoords(property)} dx="1em" dy="3.75em"
+              >Built: {property.YR_BUILT}</tspan
+            >
+            <tspan {...getTextCoords(property)} dx="1em" dy="5.25em"
               >Number of Units: {property.totalUnits}</tspan
             >
-            <tspan {...getTextCoords(property)} dx="1em" dy="3.5em"
-              >Total Assessed Value: {property.totalValue}</tspan
+            <tspan {...getTextCoords(property)} dx="1em" dy="6.75em"
+              >Average Assessed Value: ${(
+                property.totalValue / property.totalUnits
+              ).toLocaleString(undefined, { maximumFractionDigits: 0 })}</tspan
+            >
+            <tspan {...getTextCoords(property)} dx="1em" dy="8.25em"
+              >Total Assessed Value: ${property.totalValue.toLocaleString(
+                undefined,
+                { maximumFractionDigits: 0 },
+              )}</tspan
             >
           </text>
         {/if}
