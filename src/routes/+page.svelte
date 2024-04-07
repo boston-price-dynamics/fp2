@@ -37,12 +37,6 @@
       }
       return false;
     });
-    hoverColors = hoverColors.map((color, i) => {
-      if (i === index) {
-        return "green";
-      }
-      return "#FFBB05";
-    });
   }
 
   $: map?.on("move", (evt) => mapViewChanged++);
@@ -63,7 +57,6 @@
     .range([0.05, 0.75]);
 
   $: hoverSignals = filteredProperties?.map(() => false);
-  $: hoverColors = filteredProperties?.map(() => "#FFBB05");
 
   onMount(async () => {
     map = new mapboxgl.Map({
@@ -156,7 +149,7 @@
         <circle
           {...getCoords(property)}
           r={radiusScale(property.totalValue)}
-          fill={hoverColors[index]}
+          fill={hoverSignals[index] === true ? "green" : "#FFBB05"}
           fill-opacity={hoverSignals[index]
             ? 0.8
             : opacityScale(property.YR_BUILT)}
