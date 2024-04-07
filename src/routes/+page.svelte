@@ -32,7 +32,7 @@
     map = new mapboxgl.Map({
       /* options */
       container: "map",
-      style: "mapbox://styles/mapbox/streets-v12",
+      style: "mapbox://styles/jyoonsong/clupzi4l1000y01qncn84850e",
       zoom: 12,
       center: [-71.09415, 42.36027],
     });
