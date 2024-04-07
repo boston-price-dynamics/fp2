@@ -45,8 +45,14 @@
   });
 </script>
 
-<h1>🏠 Boston Price Dynamics</h1>
+<nav>
+  <h3>🏠</h3>
+</nav>
 <header>
+  <div>
+    <h4>Boston Luxury Developments</h4>
+    <p>Assessed Values</p>
+  </div>
   <label>
     Filter by year:
     <input type="range" min="1989" max="2024" bind:value={yearFilter} />

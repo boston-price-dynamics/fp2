@@ -6,7 +6,12 @@ body {
 	min-height: 100vh;
 	box-sizing: border-box;
 	margin: auto;
-	padding: 1em;
+    padding: 0 2em 2em;
+}
+
+nav {
+    width: 100%;
+    border-bottom: 1px solid #ddd;
 }
 
 #map {
@@ -28,19 +33,25 @@ body {
 header {
     display: flex;
     gap: 1em; 
-    align-items: baseline
+    align-items: baseline;
+    justify-content: space-between;
 } 
+header h4 {
+    margin-bottom: 3px;
+}
+header p {
+    margin-top: 3px;
+}
 header label {
-    margin-left: auto
+    margin-left: auto;
+    color: #777;
 }
 header input {
     width: 370px;
+    margin-top: 3px;
 }
 header year, header em {
     display: flex;
     justify-content: flex-end;
     margin-bottom: 20px;
-}
-header em {
-    color: #777;
 }
