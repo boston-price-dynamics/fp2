@@ -23,6 +23,28 @@
     return { cx: x, cy: y };
   }
 
+  function getTextCoords(property) {
+    let point = new mapboxgl.LngLat(+property.lon, +property.lat);
+    let { x, y } = map.project(point);
+    return { x: x, y: y };
+  }
+
+  function handleMouseOver(index) {
+    console.log(index);
+    hoverSignals = hoverSignals.map((item, i) => {
+      if (i === index) {
+        return true;
+      }
+      return false;
+    });
+    hoverColors = hoverColors.map((color, i) => {
+      if (i === index) {
+        return "green";
+      }
+      return "#FFBB05";
+    });
+  }
+
   $: map?.on("move", (evt) => mapViewChanged++);
 
   $: filteredProperties =
@@ -35,7 +57,10 @@
   $: opacityScale = d3
     .scaleLinear()
     .domain([1900, yearFilter === 1900 ? 2024 : yearFilter])
-    .range([0, 0.7]);
+    .range([0.1, 0.7]);
+
+  $: hoverSignals = filteredProperties?.map(() => false);
+  $: hoverColors = filteredProperties?.map(() => "#FFBB05");
 
   onMount(async () => {
     map = new mapboxgl.Map({
@@ -122,15 +147,34 @@
         <circle
           {...getCoords(property)}
           r={radiusScale(property.totalValue)}
-          fill="#FFBB05"
+          fill={hoverColors[index]}
           fill-opacity={opacityScale(property.YR_BUILT)}
           stroke="white"
+          on:mouseover={() => handleMouseOver(index)}
         >
-          <title>
-            Number of Units: {property.totalUnits} <br />
-            Total Assessed Value: {property.totalValue}
-          </title>
         </circle>
+      {/each}
+    {/key}
+
+    {#key mapViewChanged}
+      {#each filteredProperties as property, index}
+        {#if hoverSignals[index] === true}
+          <rect
+            {...getTextCoords(property)}
+            width="200"
+            height="60"
+            fill="rgba(0,0,0,0.8)"
+          >
+          </rect>
+          <text {...getTextCoords(property)} fill="#fff">
+            <tspan {...getTextCoords(property)} dx="1em" dy="2em"
+              >Number of Units: {property.totalUnits}</tspan
+            >
+            <tspan {...getTextCoords(property)} dx="1em" dy="3.5em"
+              >Total Assessed Value: {property.totalValue}</tspan
+            >
+          </text>
+        {/if}
       {/each}
     {/key}
   </svg>
