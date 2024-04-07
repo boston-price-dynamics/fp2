@@ -65,7 +65,7 @@
     await new Promise((resolve) => map.on("load", resolve));
 
     properties = await d3.csv(
-      "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/assess_lat_long.csv"
+      "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/assess_lat_long.csv",
     );
 
     properties.forEach((el) => {
@@ -75,13 +75,13 @@
     let totalValue = d3.rollup(
       properties,
       (v) => d3.sum(v, (d) => d.TOTAL_VALUE),
-      (d) => d.GIS_ID
+      (d) => d.GIS_ID,
     );
 
     let totalUnits = d3.rollup(
       properties,
       (v) => v.length,
-      (d) => d.GIS_ID
+      (d) => d.GIS_ID,
     );
 
     let unique = {};
