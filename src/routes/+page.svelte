@@ -13,6 +13,7 @@
 
   let properties = [];
   let radiusScale;
+  let opacityScale;
 
   let yearFilter = 1900;
 
@@ -24,11 +25,6 @@
 
   $: map?.on("move", (evt) => mapViewChanged++);
 
-  // $: radiusScale = d3
-  //   .scaleSqrt()
-  //   .domain([0, d3.max(properties, (d) => d.totalValue)])
-  //   .range([0, 40]);
-
   $: filteredProperties =
     yearFilter === 1900
       ? properties
@@ -36,19 +32,22 @@
           return property.YR_BUILT <= yearFilter;
         });
 
-  // $: totalValues
+  $: opacityScale = d3
+    .scaleLinear()
+    .domain([1900, yearFilter === 1900 ? 2024 : yearFilter])
+    .range([0, 0.7]);
 
   onMount(async () => {
     map = new mapboxgl.Map({
       container: "map",
-      style: "mapbox://styles/mapbox/streets-v12",
+      style: "mapbox://styles/jyoonsong/cluq04ktu05cr01qqb4rp4v4f",
       center: [-71.09415, 42.36027],
       zoom: 12,
     });
     await new Promise((resolve) => map.on("load", resolve));
 
     properties = await d3.csv(
-      "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/assess_lat_long.csv",
+      "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/assess_lat_long.csv"
     );
 
     properties.forEach((el) => {
@@ -58,27 +57,36 @@
     let totalValue = d3.rollup(
       properties,
       (v) => d3.sum(v, (d) => d.TOTAL_VALUE),
-      (d) => d.GIS_ID,
+      (d) => d.GIS_ID
     );
 
     let totalUnits = d3.rollup(
       properties,
       (v) => v.length,
-      (d) => d.GIS_ID,
+      (d) => d.GIS_ID
     );
 
-    properties = properties.map((property) => {
-      let id = property.GIS_ID;
-      property.totalValue = totalValue.get(id) ?? 0;
-      property.totalUnits = totalUnits.get(id) ?? 0;
-      return property;
-    });
-
-    // deduplicate
+    let unique = {};
+    properties = properties
+      .map((property) => {
+        let id = property.GIS_ID;
+        property.totalValue = totalValue.get(id) ?? 0;
+        property.totalUnits = totalUnits.get(id) ?? 0;
+        return property;
+      })
+      // deduplicate
+      .filter((property) => {
+        if (property.GIS_ID in unique) {
+          return false;
+        }
+        unique[property.GIS_ID] = true;
+        return true;
+      });
 
     properties = properties.filter((property) => {
       return property.totalValue > 100_000_000;
     });
+    console.log(properties);
 
     radiusScale = d3
       .scaleSqrt()
@@ -114,23 +122,16 @@
         <circle
           {...getCoords(property)}
           r={radiusScale(property.totalValue)}
-          fill="steelblue"
-        ></circle>
-      {/each}
-      <!-- {#each stations as station}
-        <circle
-          {...getCoords(station)}
-          r={radiusScale(station.totalTraffic)}
-          fill="steelblue"
-          fill-opacity="0.6"
+          fill="#FFBB05"
+          fill-opacity={opacityScale(property.YR_BUILT)}
           stroke="white"
         >
-          <title
-            >{station.totalTraffic} trips ({station.departures} departures, {station.arrivals}
-            arrivals)</title
-          >
+          <title>
+            Number of Units: {property.totalUnits} <br />
+            Total Assessed Value: {property.totalValue}
+          </title>
         </circle>
-      {/each} -->
+      {/each}
     {/key}
   </svg>
 </div>
