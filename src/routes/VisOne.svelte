@@ -47,67 +47,6 @@
         //     return true;
         // });
 
-        // set the dimensions and margins of the graph
-        var margin = { top: 10, right: 30, bottom: 30, left: 60 },
-            width = 460 - margin.left - margin.right,
-            height = 400 - margin.top - margin.bottom;
-
-        // append the svg object to the body of the page
-        var svg = d3
-            .select("#scatter")
-            .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr(
-                "transform",
-                "translate(" + margin.left + "," + margin.top + ")"
-            );
-
-        // Add X axis
-        var x = d3.scaleLinear().domain([0, 5_000_000]).range([0, width]);
-        svg.append("g")
-            .attr("transform", "translate(0," + height + ")")
-            .call(
-                d3
-                    .axisBottom(x)
-                    .tickFormat((d, i) => (d === 0 ? 0 : d / 1_000_000 + "M"))
-            );
-
-        // Add Y axis
-        var y = d3
-            .scaleLinear()
-            .domain([0, propertiesByYear.length])
-            .range([height, 0]);
-        // svg.append("g").call(d3.axisLeft(y));
-
-        const half = propertiesByYear.length / 2;
-
-        // Add dots
-        svg.append("g")
-            .selectAll("dot")
-            .data(propertiesByYear)
-            .enter()
-            .append("circle")
-            .attr("cx", function (d) {
-                return x(d.TOTAL_VALUE);
-            })
-            .attr("cy", function (d, i) {
-                let range = propertiesByYear.filter(
-                    (p) =>
-                        p.TOTAL_VALUE <= parseInt(d.TOTAL_VALUE) + 100_000 &&
-                        p.TOTAL_VALUE >= parseInt(d.TOTAL_VALUE) - 100_000
-                );
-                const result =
-                    i % 2 === 0
-                        ? half + Math.random() * range.length
-                        : half - Math.random() * range.length;
-                return y(result);
-                // return y(10);
-            })
-            .attr("r", 1.5)
-            .style("fill", "#69b3a2");
-
         radiusScale = d3
             .scaleSqrt()
             .domain([0, d3.max(properties, (d) => d.totalUnits)])
@@ -134,6 +73,24 @@
             }
             return false;
         });
+    }
+
+    function handleCx(value) {
+        var x = d3.scaleLinear().domain([0, 5_000_000]).range([0, 460]);
+        return x(value);
+    }
+
+    function handleCy(value, index) {
+        var y = d3.scaleLinear().domain([0, 2000]).range([400, 0]);
+
+        const range = propertiesByYear.filter(
+            (p) =>
+                p.TOTAL_VALUE <= parseInt(value) + 100_000 &&
+                p.TOTAL_VALUE >= parseInt(value) - 100_000
+        );
+        const multiplier = index % 2 === 0 ? 1 : -1;
+        const result = 1000 + multiplier * Math.random() * range.length;
+        return y(result);
     }
 
     $: hoverSignals = mappedProperties?.map(() => false);
@@ -321,10 +278,19 @@
                         y="9"
                         dy="0.71em">5M</text
                     ></g
-                ></g
-            >
+                >
+            </g>
             <!-- SCATTER -->
-            <g> </g>
+            <g>
+                {#each propertiesByYear as property, index}
+                    <circle
+                        cx={handleCx(property.TOTAL_VALUE)}
+                        cy={handleCy(property.TOTAL_VALUE, index)}
+                        r="1.5"
+                        fill="#69b3a2"
+                    ></circle>
+                {/each}
+            </g>
         </g>
     </svg>
 </div>
