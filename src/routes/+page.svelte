@@ -126,19 +126,32 @@
   <h3>🏠</h3>
 </nav>
 <h3>
-  Boston <em>is</em> building new housing. But who is it actually for? What
-  fraction of new developments can <em>you</em> afford?
+  <b>The Greater Boston area is, undeniably, undergoing a housing crisis.</b>
+  Bostonians are finding it harder and harder to find available - and affordable
+  - housing, forcing some to leave the area entirely. Despite this, the area is simultaneously
+  undergoing a sort of housing boom, with new high-rises redefining the city's skyline.
+  So, Boston
+  <em>is</em>
+  building new housing.
+  <b
+    >But who is it actually for? What fraction of new developments can <em
+      >you</em
+    > afford?</b
+  >
 </h3>
+<div class="sep"></div>
 <VisOne />
 <!-- <LoremIpsum /> -->
 <h3>
-  Evidently, developers overwhelmingly target wealthy buyers. Much fewer
+  <b>Evidently, developers overwhelmingly target wealthy buyers. </b>Much fewer
   affordable units were built in the same timeframe. However, some argue that
   any new housing is good housing. The argument is that by increasing the
   housing supply (even with only luxury housing), savings would eventually
-  trickle down to all homebuyers. But, is this true? How have luxury
-  developments in Boston affected house prices in their surrounding
-  neighborhoods?
+  trickle down to all homebuyers.
+  <b
+    >But, is this true? How have luxury developments in Boston affected house
+    prices in their surrounding neighborhoods?</b
+  >
 </h3>
 
 <!-- <header>

@@ -14,6 +14,10 @@ nav {
     border-bottom: 1px solid #ddd;
 }
 
+.sep {
+    margin-bottom: 30px;
+}
+
 .map {
     /* flex: 1; */
 }
@@ -85,4 +89,8 @@ header year {
     display: block;
     display: flex;
     justify-content: flex-end;
+}
+
+h3 {
+    font-weight: normal;
 }
