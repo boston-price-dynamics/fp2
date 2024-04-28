@@ -22,13 +22,13 @@
         await new Promise((resolve) => map.on("load", resolve));
 
         properties = await d3.csv(
-            "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/assess_lat_long.csv",
+            "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/assess_lat_long.csv"
         );
 
         let totalUnits = d3.rollup(
             properties,
             (v) => v.length,
-            (d) => d.GIS_ID,
+            (d) => d.GIS_ID
         );
 
         // let unique = {};
@@ -37,6 +37,7 @@
             property.totalUnits = totalUnits.get(id) ?? 0;
             return property;
         });
+
         // deduplicate
         // .filter((property) => {
         //     if (property.GIS_ID in unique) {
@@ -45,6 +46,67 @@
         //     unique[property.GIS_ID] = true;
         //     return true;
         // });
+
+        // set the dimensions and margins of the graph
+        var margin = { top: 10, right: 30, bottom: 30, left: 60 },
+            width = 460 - margin.left - margin.right,
+            height = 400 - margin.top - margin.bottom;
+
+        // append the svg object to the body of the page
+        var svg = d3
+            .select("#scatter")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr(
+                "transform",
+                "translate(" + margin.left + "," + margin.top + ")"
+            );
+
+        // Add X axis
+        var x = d3.scaleLinear().domain([0, 5_000_000]).range([0, width]);
+        svg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(
+                d3
+                    .axisBottom(x)
+                    .tickFormat((d, i) => (d === 0 ? 0 : d / 1_000_000 + "M"))
+            );
+
+        // Add Y axis
+        var y = d3
+            .scaleLinear()
+            .domain([0, propertiesByYear.length])
+            .range([height, 0]);
+        // svg.append("g").call(d3.axisLeft(y));
+
+        const half = propertiesByYear.length / 2;
+
+        // Add dots
+        svg.append("g")
+            .selectAll("dot")
+            .data(propertiesByYear)
+            .enter()
+            .append("circle")
+            .attr("cx", function (d) {
+                return x(d.TOTAL_VALUE);
+            })
+            .attr("cy", function (d, i) {
+                let range = propertiesByYear.filter(
+                    (p) =>
+                        p.TOTAL_VALUE <= parseInt(d.TOTAL_VALUE) + 100_000 &&
+                        p.TOTAL_VALUE >= parseInt(d.TOTAL_VALUE) - 100_000
+                );
+                const result =
+                    i % 2 === 0
+                        ? half + Math.random() * range.length
+                        : half - Math.random() * range.length;
+                return y(result);
+                // return y(10);
+            })
+            .attr("r", 1.5)
+            .style("fill", "#69b3a2");
 
         radiusScale = d3
             .scaleSqrt()
@@ -88,13 +150,17 @@
         );
     });
 
+    $: propertiesByYear = properties.filter(
+        (p) => parseInt(p.YR_BUILT) === yearFilter
+    );
+
     let mappedProperties = [];
 
     $: {
         let totalFilteredUnits = d3.rollup(
             filteredProperties,
             (v) => v.length,
-            (d) => d.GIS_ID,
+            (d) => d.GIS_ID
         );
         let unique = {};
         mappedProperties = filteredProperties
@@ -173,6 +239,93 @@
                 {/if}
             {/each}
         {/key}
+    </svg>
+</div>
+
+<div id="scatter">
+    <svg width="460" height="400">
+        <g transform="translate(60, 10)">
+            <!-- X AXIS -->
+            <g
+                transform="translate(0,360)"
+                fill="none"
+                font-size="10"
+                font-family="sans-serif"
+                text-anchor="middle"
+            >
+                <path class="domain" stroke="currentColor" d="M0,6V0H370V6"
+                ></path>
+                <g class="tick" opacity="1" transform="translate(0,0)"
+                    ><line stroke="currentColor" y2="6"></line><text
+                        fill="currentColor"
+                        y="9"
+                        dy="0.71em">0</text
+                    ></g
+                ><g class="tick" opacity="1" transform="translate(37,0)"
+                    ><line stroke="currentColor" y2="6"></line><text
+                        fill="currentColor"
+                        y="9"
+                        dy="0.71em">0.5M</text
+                    ></g
+                ><g class="tick" opacity="1" transform="translate(74,0)"
+                    ><line stroke="currentColor" y2="6"></line><text
+                        fill="currentColor"
+                        y="9"
+                        dy="0.71em">1M</text
+                    ></g
+                ><g class="tick" opacity="1" transform="translate(111,0)"
+                    ><line stroke="currentColor" y2="6"></line><text
+                        fill="currentColor"
+                        y="9"
+                        dy="0.71em">1.5M</text
+                    ></g
+                ><g class="tick" opacity="1" transform="translate(148,0)"
+                    ><line stroke="currentColor" y2="6"></line><text
+                        fill="currentColor"
+                        y="9"
+                        dy="0.71em">2M</text
+                    ></g
+                ><g class="tick" opacity="1" transform="translate(185,0)"
+                    ><line stroke="currentColor" y2="6"></line><text
+                        fill="currentColor"
+                        y="9"
+                        dy="0.71em">2.5M</text
+                    ></g
+                ><g class="tick" opacity="1" transform="translate(222,0)"
+                    ><line stroke="currentColor" y2="6"></line><text
+                        fill="currentColor"
+                        y="9"
+                        dy="0.71em">3M</text
+                    ></g
+                ><g class="tick" opacity="1" transform="translate(259,0)"
+                    ><line stroke="currentColor" y2="6"></line><text
+                        fill="currentColor"
+                        y="9"
+                        dy="0.71em">3.5M</text
+                    ></g
+                ><g class="tick" opacity="1" transform="translate(296,0)"
+                    ><line stroke="currentColor" y2="6"></line><text
+                        fill="currentColor"
+                        y="9"
+                        dy="0.71em">4M</text
+                    ></g
+                ><g class="tick" opacity="1" transform="translate(333,0)"
+                    ><line stroke="currentColor" y2="6"></line><text
+                        fill="currentColor"
+                        y="9"
+                        dy="0.71em">4.5M</text
+                    ></g
+                ><g class="tick" opacity="1" transform="translate(370,0)"
+                    ><line stroke="currentColor" y2="6"></line><text
+                        fill="currentColor"
+                        y="9"
+                        dy="0.71em">5M</text
+                    ></g
+                ></g
+            >
+            <!-- SCATTER -->
+            <g> </g>
+        </g>
     </svg>
 </div>
 
