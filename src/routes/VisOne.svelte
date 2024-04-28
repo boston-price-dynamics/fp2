@@ -23,13 +23,13 @@
         await new Promise((resolve) => map.on("load", resolve));
 
         properties = await d3.csv(
-            "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/assess_lat_long.csv",
+            "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/assess_lat_long.csv"
         );
 
         let totalUnits = d3.rollup(
             properties,
             (v) => v.length,
-            (d) => d.GIS_ID,
+            (d) => d.GIS_ID
         );
 
         properties = properties.map((property) => {
@@ -72,12 +72,12 @@
 
     function handleCy(value, index) {
         var max = 1800;
-        var y = d3.scaleLinear().domain([0, max]).range([300, 0]);
+        var y = d3.scaleLinear().domain([0, max]).range([270, 0]);
 
         const range = filteredPropertiesByYear.filter(
             (p) =>
                 p.TOTAL_VALUE <= parseInt(value) + 100_000 &&
-                p.TOTAL_VALUE >= parseInt(value) - 100_000,
+                p.TOTAL_VALUE >= parseInt(value) - 100_000
         );
         const multiplier = index % 2 === 0 ? 1 : -1;
         const result = max / 2 + multiplier * Math.random() * range.length;
@@ -86,9 +86,9 @@
 
     function handleColor(value, incomeFilter) {
         if (incomeFilter === 1000000 || value * 0.32 < incomeFilter) {
-            return "green";
+            return "#1a9850";
         }
-        return "red";
+        return "#d73027";
     }
 
     $: map?.on("move", (evt) => mapViewChanged++);
@@ -121,7 +121,7 @@
         let totalUnitsYear = d3.rollup(
             filteredPropertiesYear,
             (v) => v.length,
-            (d) => d.GIS_ID,
+            (d) => d.GIS_ID
         );
         let totalValueYear = d3.rollup(
             filteredPropertiesYear,
@@ -140,12 +140,12 @@
                 return incomeFilter === 1000000
                     ? true
                     : property.TOTAL_VALUE * 0.32 < incomeFilter;
-            },
+            }
         );
         let totalUnitsYearIncome = d3.rollup(
             filteredPropertiesYearIncome,
             (v) => v.length,
-            (d) => d.GIS_ID,
+            (d) => d.GIS_ID
         );
         let unique = {};
         filteredPropertiesYear = filteredPropertiesYear
@@ -189,7 +189,7 @@
                     number_affordable: _filteredPropertiesYearIncome.length,
                     median_value: d3.median(
                         _filteredPropertiesYear,
-                        (d) => d.TOTAL_VALUE,
+                        (d) => d.TOTAL_VALUE
                     ),
                 };
             }
@@ -237,7 +237,7 @@
                             r={radiusScale(property.totalUnitsYear)}
                             fill={colorScale(
                                 property.totalUnitsYearIncome /
-                                    property.totalUnitsYear,
+                                    property.totalUnitsYear
                             )}
                             fill-opacity="0.7"
                             stroke="white"
@@ -336,11 +336,11 @@
             {/each}
         </div>
         <div id="scatter">
-            <svg width="800" height="300">
-                <g transform="translate(10,10)">
+            <svg width="800" height="270">
+                <g transform="translate(10,0)">
                     <!-- X axis -->
                     <g
-                        transform="translate(0,260)"
+                        transform="translate(0,210)"
                         fill="none"
                         font-size="10"
                         font-family="sans-serif"
@@ -348,7 +348,7 @@
                         ><path
                             class="domain"
                             stroke="currentColor"
-                            d="M0,6V0H790V6"
+                            d="M0,6V0H760V6"
                         ></path><g
                             class="tick"
                             opacity="1"
@@ -358,7 +358,7 @@
                                 y="9"
                                 dy="0.71em">0M</text
                             ></g
-                        ><g class="tick" opacity="1" transform="translate(79,0)"
+                        ><g class="tick" opacity="1" transform="translate(76,0)"
                             ><line stroke="currentColor" y2="6"></line><text
                                 fill="currentColor"
                                 y="9"
@@ -367,7 +367,7 @@
                         ><g
                             class="tick"
                             opacity="1"
-                            transform="translate(158,0)"
+                            transform="translate(152,0)"
                             ><line stroke="currentColor" y2="6"></line><text
                                 fill="currentColor"
                                 y="9"
@@ -376,7 +376,7 @@
                         ><g
                             class="tick"
                             opacity="1"
-                            transform="translate(237,0)"
+                            transform="translate(228,0)"
                             ><line stroke="currentColor" y2="6"></line><text
                                 fill="currentColor"
                                 y="9"
@@ -385,7 +385,7 @@
                         ><g
                             class="tick"
                             opacity="1"
-                            transform="translate(316,0)"
+                            transform="translate(304,0)"
                             ><line stroke="currentColor" y2="6"></line><text
                                 fill="currentColor"
                                 y="9"
@@ -394,7 +394,7 @@
                         ><g
                             class="tick"
                             opacity="1"
-                            transform="translate(395,0)"
+                            transform="translate(380,0)"
                             ><line stroke="currentColor" y2="6"></line><text
                                 fill="currentColor"
                                 y="9"
@@ -403,7 +403,7 @@
                         ><g
                             class="tick"
                             opacity="1"
-                            transform="translate(474,0)"
+                            transform="translate(456,0)"
                             ><line stroke="currentColor" y2="6"></line><text
                                 fill="currentColor"
                                 y="9"
@@ -412,7 +412,7 @@
                         ><g
                             class="tick"
                             opacity="1"
-                            transform="translate(553,0)"
+                            transform="translate(532,0)"
                             ><line stroke="currentColor" y2="6"></line><text
                                 fill="currentColor"
                                 y="9"
@@ -421,7 +421,7 @@
                         ><g
                             class="tick"
                             opacity="1"
-                            transform="translate(632,0)"
+                            transform="translate(608,0)"
                             ><line stroke="currentColor" y2="6"></line><text
                                 fill="currentColor"
                                 y="9"
@@ -430,7 +430,7 @@
                         ><g
                             class="tick"
                             opacity="1"
-                            transform="translate(711,0)"
+                            transform="translate(684,0)"
                             ><line stroke="currentColor" y2="6"></line><text
                                 fill="currentColor"
                                 y="9"
@@ -439,16 +439,21 @@
                         ><g
                             class="tick"
                             opacity="1"
-                            transform="translate(790,0)"
+                            transform="translate(760,0)"
                             ><line stroke="currentColor" y2="6"></line><text
                                 fill="currentColor"
                                 y="9"
                                 dy="0.71em">5M</text
                             ></g
-                        ></g
-                    >
+                        >
+                        <text
+                            transform="translate(380,37)"
+                            fill="#000"
+                            style="font-size: 12px;">House Price</text
+                        >
+                    </g>
                     <!-- SCATTER -->
-                    <g>
+                    <g transform="translate(0, -30)">
                         {#each filteredPropertiesByYear as property, index}
                             <circle
                                 cx={handleCx(property.TOTAL_VALUE)}
@@ -457,7 +462,7 @@
                                 opacity="0.5"
                                 fill={handleColor(
                                     property.TOTAL_VALUE,
-                                    incomeFilter,
+                                    incomeFilter
                                 )}
                             ></circle>
                         {/each}
