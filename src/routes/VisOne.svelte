@@ -32,21 +32,11 @@
             (d) => d.GIS_ID,
         );
 
-        // let unique = {};
         properties = properties.map((property) => {
             let id = property.GIS_ID;
             property.totalUnits = totalUnits.get(id) ?? 0;
             return property;
         });
-
-        // deduplicate
-        // .filter((property) => {
-        //     if (property.GIS_ID in unique) {
-        //         return false;
-        //     }
-        //     unique[property.GIS_ID] = true;
-        //     return true;
-        // });
 
         radiusScale = d3
             .scaleSqrt()
@@ -158,7 +148,10 @@
         hoverSignals = filteredPropertiesYear?.map(() => false);
     }
 
-    let colorScale = d3.scaleLinear().domain([0, 1]).range(["red", "green"]);
+    let colorScale = d3
+        .scaleLinear()
+        .domain([0, 0.5, 1])
+        .range(["#d73027", "#ffffbf", "#1a9850"]);
 
     let statsByYear = {};
     $: {
@@ -198,7 +191,10 @@
 >
     <svelte:fragment slot="viz">
         <header>
-            <div>{yearFilter}</div>
+            <div>
+                <h4>New Developments in Boston in {yearFilter}</h4>
+                <p>Source: Boston Property Assessment Data</p>
+            </div>
             <label>
                 Enter your annual income:
                 <input
@@ -225,7 +221,7 @@
                                 property.totalUnitsYearIncome /
                                     property.totalUnitsYear,
                             )}
-                            fill-opacity={1}
+                            fill-opacity="0.7"
                             stroke="white"
                             on:mouseover={() => handleMouseOver(index)}
                             on:mouseleave={() => handleMouseOver(-1)}
@@ -274,6 +270,38 @@
                         {/if}
                     {/each}
                 {/key}
+            </svg>
+        </div>
+        <div id="map_legend">
+            <div>% Affordable:</div>
+            {#each [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1] as color, index}
+                <div style="--color: {colorScale(color)}">{color * 100}%</div>
+            {/each}
+        </div>
+        <div id="size_legend">
+            <svg width="100" height="100">
+                {#each [10, 50, 120] as sz, index}
+                    <circle
+                        cx="50"
+                        cy={radiusScale ? 90 - radiusScale(sz) : 0}
+                        r={radiusScale ? radiusScale(sz) : 0}
+                        stroke="black"
+                        fill="none"
+                    ></circle>
+                    <line
+                        x1={radiusScale ? 50 + radiusScale(sz) : 0}
+                        x2="80"
+                        y1={radiusScale ? 90 - radiusScale(sz) : 0}
+                        y2={radiusScale ? 90 - radiusScale(sz) : 0}
+                        stroke="black"
+                    ></line>
+                    <text
+                        x="80"
+                        y={radiusScale ? 90 - radiusScale(sz) : 0}
+                        font-size="10"
+                        alignment-baseline="middle">{sz}</text
+                    >
+                {/each}
             </svg>
         </div>
         <div id="scatter">
@@ -424,7 +452,7 @@
                     </h2>
                 </div>
                 <div class="stat">
-                    <p>Median unit price:</p>
+                    <p>Median new unit price:</p>
                     <h2>{USDollar.format(statsByYear[year]?.median_value)}</h2>
                 </div>
             </section>
@@ -448,5 +476,19 @@
     section h1 {
         font-size: 100px;
         margin: 0;
+    }
+
+    #map_legend {
+        display: flex;
+        justify-content: space-between;
+        gap: 1px;
+        margin-top: 5px;
+
+        & div {
+            flex: 1;
+            text-align: center;
+            background-color: var(--color);
+            font-size: 9px;
+        }
     }
 </style>

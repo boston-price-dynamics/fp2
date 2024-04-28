@@ -30,7 +30,7 @@ nav {
     pointer-events: auto;
 }
 
-header {
+/* header {
     display: flex;
     gap: 1em;
     align-items: baseline;
@@ -46,6 +46,7 @@ header p {
 }
 
 header label {
+    display: block;
     margin-left: auto;
     color: #777;
 }
@@ -60,4 +61,28 @@ header em {
     display: flex;
     justify-content: flex-end;
     margin-bottom: 20px;
+    display: block;
+} */
+
+header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+header h4,
+p {
+    margin: 0;
+}
+
+header label {
+    color: #777;
+    margin-left: auto;
+}
+
+header year {
+    display: block;
+    display: flex;
+    justify-content: flex-end;
 }
