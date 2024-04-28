@@ -130,7 +130,16 @@
   fraction of new developments can <em>you</em> afford?
 </h3>
 <VisOne />
-<LoremIpsum />
+<!-- <LoremIpsum /> -->
+<h3>
+  Evidently, developers overwhelmingly target wealthy buyers. Much fewer
+  affordable units were built in the same timeframe. However, some argue that
+  any new housing is good housing. The argument is that by increasing the
+  housing supply (even with only luxury housing), savings would eventually
+  trickle down to all homebuyers. But, is this true? How have luxury
+  developments in Boston affected house prices in their surrounding
+  neighborhoods?
+</h3>
 
 <!-- <header>
   <div>

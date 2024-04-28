@@ -123,9 +123,15 @@
             (v) => v.length,
             (d) => d.GIS_ID,
         );
+        let totalValueYear = d3.rollup(
+            filteredPropertiesYear,
+            (v) => d3.sum(v, (d) => d.TOTAL_VALUE),
+            (d) => d.GIS_ID,
+        );
         filteredPropertiesYear = filteredPropertiesYear.map((property) => {
             let id = property.GIS_ID;
             property.totalUnitsYear = totalUnitsYear.get(id) ?? 0;
+            property.totalValueYear = totalValueYear.get(id) ?? 0;
             return property;
         });
 
@@ -264,20 +270,36 @@
                                     {...getTextCoords(property)}
                                     dx="1em"
                                     dy="3.75em"
-                                    >Built: {property.YR_BUILT}</tspan
+                                    >New units built: {property.totalUnitsYear}</tspan
                                 >
                                 <tspan
                                     {...getTextCoords(property)}
                                     dx="1em"
                                     dy="5.25em"
-                                    ># Units: {property.totalUnitsYear}</tspan
+                                    >New units you can afford: {property.totalUnitsYearIncome}</tspan
                                 >
                                 <tspan
                                     {...getTextCoords(property)}
                                     dx="1em"
                                     dy="6.75em"
-                                    ># Units Afforded: {property.totalUnitsYearIncome}</tspan
+                                    >% units you can afford: {(
+                                        (property.totalUnitsYearIncome /
+                                            property.totalUnitsYear) *
+                                        100
+                                    ).toLocaleString(undefined, {
+                                        maximumFractionDigits: 2,
+                                    })}%</tspan
                                 >
+                                <tspan
+                                    {...getTextCoords(property)}
+                                    dx="1em"
+                                    dy="8.25em"
+                                    >Average new unit price:
+                                    {USDollar.format(
+                                        property.totalValueYear /
+                                            property.totalUnitsYear,
+                                    )}
+                                </tspan>
                             </text>
                         {/if}
                     {/each}
