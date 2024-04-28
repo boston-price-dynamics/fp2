@@ -23,13 +23,13 @@
         await new Promise((resolve) => map.on("load", resolve));
 
         properties = await d3.csv(
-            "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/assess_lat_long.csv",
+            "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/assess_lat_long.csv"
         );
 
         let totalUnits = d3.rollup(
             properties,
             (v) => v.length,
-            (d) => d.GIS_ID,
+            (d) => d.GIS_ID
         );
 
         properties = properties.map((property) => {
@@ -66,21 +66,29 @@
     }
 
     function handleCx(value) {
-        var x = d3.scaleLinear().domain([0, 5_000_000]).range([0, 460]);
+        var x = d3.scaleLinear().domain([0, 5_000_000]).range([0, 830]);
         return x(value);
     }
 
     function handleCy(value, index) {
-        var y = d3.scaleLinear().domain([0, 2000]).range([400, 0]);
+        var max = 1800;
+        var y = d3.scaleLinear().domain([0, max]).range([300, 0]);
 
-        const range = filteredPropertiesYear.filter(
+        const range = filteredPropertiesByYear.filter(
             (p) =>
                 p.TOTAL_VALUE <= parseInt(value) + 100_000 &&
-                p.TOTAL_VALUE >= parseInt(value) - 100_000,
+                p.TOTAL_VALUE >= parseInt(value) - 100_000
         );
         const multiplier = index % 2 === 0 ? 1 : -1;
-        const result = 1000 + multiplier * Math.random() * range.length;
+        const result = max / 2 + multiplier * Math.random() * range.length;
         return y(result);
+    }
+
+    function handleColor(value, incomeFilter) {
+        if (incomeFilter === 1000000 || value * 0.32 < incomeFilter) {
+            return "green";
+        }
+        return "red";
     }
 
     $: map?.on("move", (evt) => mapViewChanged++);
@@ -98,6 +106,10 @@
         years.push(year);
     }
 
+    $: filteredPropertiesByYear = properties.filter((property) => {
+        return property.YR_BUILT == yearFilter;
+    });
+
     let filteredPropertiesYear;
     let filteredPropertiesYearIncome;
     let hoverSignals;
@@ -109,7 +121,7 @@
         let totalUnitsYear = d3.rollup(
             filteredPropertiesYear,
             (v) => v.length,
-            (d) => d.GIS_ID,
+            (d) => d.GIS_ID
         );
         filteredPropertiesYear = filteredPropertiesYear.map((property) => {
             let id = property.GIS_ID;
@@ -122,12 +134,12 @@
                 return incomeFilter === 1000000
                     ? true
                     : property.TOTAL_VALUE * 0.32 < incomeFilter;
-            },
+            }
         );
         let totalUnitsYearIncome = d3.rollup(
             filteredPropertiesYearIncome,
             (v) => v.length,
-            (d) => d.GIS_ID,
+            (d) => d.GIS_ID
         );
         let unique = {};
         filteredPropertiesYear = filteredPropertiesYear
@@ -171,7 +183,7 @@
                     number_affordable: _filteredPropertiesYearIncome.length,
                     median_value: d3.median(
                         _filteredPropertiesYear,
-                        (d) => d.TOTAL_VALUE,
+                        (d) => d.TOTAL_VALUE
                     ),
                 };
             }
@@ -219,7 +231,7 @@
                             r={radiusScale(property.totalUnitsYear)}
                             fill={colorScale(
                                 property.totalUnitsYearIncome /
-                                    property.totalUnitsYear,
+                                    property.totalUnitsYear
                             )}
                             fill-opacity="0.7"
                             stroke="white"
@@ -305,34 +317,38 @@
             </svg>
         </div>
         <div id="scatter">
-            <svg width="460" height="400">
-                <g transform="translate(60, 10)">
-                    <!-- X AXIS -->
+            <svg width="830" height="300">
+                <g transform="translate(10,10)">
+                    <!-- X axis -->
                     <g
-                        transform="translate(0,360)"
+                        transform="translate(0,260)"
                         fill="none"
                         font-size="10"
                         font-family="sans-serif"
                         text-anchor="middle"
-                    >
-                        <path
+                        ><path
                             class="domain"
                             stroke="currentColor"
-                            d="M0,6V0H370V6"
-                        ></path>
-                        <g class="tick" opacity="1" transform="translate(0,0)"
+                            d="M0,6V0H790V6"
+                        ></path><g
+                            class="tick"
+                            opacity="1"
+                            transform="translate(0,0)"
                             ><line stroke="currentColor" y2="6"></line><text
                                 fill="currentColor"
                                 y="9"
-                                dy="0.71em">0</text
+                                dy="0.71em">0M</text
                             ></g
-                        ><g class="tick" opacity="1" transform="translate(37,0)"
+                        ><g class="tick" opacity="1" transform="translate(79,0)"
                             ><line stroke="currentColor" y2="6"></line><text
                                 fill="currentColor"
                                 y="9"
                                 dy="0.71em">0.5M</text
                             ></g
-                        ><g class="tick" opacity="1" transform="translate(74,0)"
+                        ><g
+                            class="tick"
+                            opacity="1"
+                            transform="translate(158,0)"
                             ><line stroke="currentColor" y2="6"></line><text
                                 fill="currentColor"
                                 y="9"
@@ -341,7 +357,7 @@
                         ><g
                             class="tick"
                             opacity="1"
-                            transform="translate(111,0)"
+                            transform="translate(237,0)"
                             ><line stroke="currentColor" y2="6"></line><text
                                 fill="currentColor"
                                 y="9"
@@ -350,7 +366,7 @@
                         ><g
                             class="tick"
                             opacity="1"
-                            transform="translate(148,0)"
+                            transform="translate(316,0)"
                             ><line stroke="currentColor" y2="6"></line><text
                                 fill="currentColor"
                                 y="9"
@@ -359,7 +375,7 @@
                         ><g
                             class="tick"
                             opacity="1"
-                            transform="translate(185,0)"
+                            transform="translate(395,0)"
                             ><line stroke="currentColor" y2="6"></line><text
                                 fill="currentColor"
                                 y="9"
@@ -368,7 +384,7 @@
                         ><g
                             class="tick"
                             opacity="1"
-                            transform="translate(222,0)"
+                            transform="translate(474,0)"
                             ><line stroke="currentColor" y2="6"></line><text
                                 fill="currentColor"
                                 y="9"
@@ -377,7 +393,7 @@
                         ><g
                             class="tick"
                             opacity="1"
-                            transform="translate(259,0)"
+                            transform="translate(553,0)"
                             ><line stroke="currentColor" y2="6"></line><text
                                 fill="currentColor"
                                 y="9"
@@ -386,7 +402,7 @@
                         ><g
                             class="tick"
                             opacity="1"
-                            transform="translate(296,0)"
+                            transform="translate(632,0)"
                             ><line stroke="currentColor" y2="6"></line><text
                                 fill="currentColor"
                                 y="9"
@@ -395,7 +411,7 @@
                         ><g
                             class="tick"
                             opacity="1"
-                            transform="translate(333,0)"
+                            transform="translate(711,0)"
                             ><line stroke="currentColor" y2="6"></line><text
                                 fill="currentColor"
                                 y="9"
@@ -404,22 +420,26 @@
                         ><g
                             class="tick"
                             opacity="1"
-                            transform="translate(370,0)"
+                            transform="translate(790,0)"
                             ><line stroke="currentColor" y2="6"></line><text
                                 fill="currentColor"
                                 y="9"
                                 dy="0.71em">5M</text
                             ></g
-                        >
-                    </g>
+                        ></g
+                    >
                     <!-- SCATTER -->
                     <g>
-                        {#each filteredPropertiesYear as property, index}
+                        {#each filteredPropertiesByYear as property, index}
                             <circle
                                 cx={handleCx(property.TOTAL_VALUE)}
                                 cy={handleCy(property.TOTAL_VALUE, index)}
-                                r="1.5"
-                                fill="#69b3a2"
+                                r="3"
+                                opacity="0.5"
+                                fill={handleColor(
+                                    property.TOTAL_VALUE,
+                                    incomeFilter
+                                )}
                             ></circle>
                         {/each}
                     </g>
