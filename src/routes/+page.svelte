@@ -13,7 +13,7 @@
             const half = window.innerHeight / 2;
             const top = window.scrollY;
             opacity = top >= half ? 0 : (half - top) / half;
-            scale = (half + top) / half;
+            scale = top >= half ? 2 : (half + top) / half;
             scaleText = (half + top / 2) / half;
         });
     });
