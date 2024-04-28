@@ -17,19 +17,19 @@
         map = new mapboxgl.Map({
             container: "mapone",
             style: "mapbox://styles/jyoonsong/cluq04ktu05cr01qqb4rp4v4f",
-            center: [-71.1007596, 42.3149367],
+            center: [-71.1007596, 42.3249561],
             zoom: 11,
         });
         await new Promise((resolve) => map.on("load", resolve));
 
         properties = await d3.csv(
-            "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/assess_lat_long.csv"
+            "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/assess_lat_long.csv",
         );
 
         let totalUnits = d3.rollup(
             properties,
             (v) => v.length,
-            (d) => d.GIS_ID
+            (d) => d.GIS_ID,
         );
 
         properties = properties.map((property) => {
@@ -66,7 +66,7 @@
     }
 
     function handleCx(value) {
-        var x = d3.scaleLinear().domain([0, 5_000_000]).range([0, 830]);
+        var x = d3.scaleLinear().domain([0, 5_000_000]).range([0, 800]);
         return x(value);
     }
 
@@ -77,7 +77,7 @@
         const range = filteredPropertiesByYear.filter(
             (p) =>
                 p.TOTAL_VALUE <= parseInt(value) + 100_000 &&
-                p.TOTAL_VALUE >= parseInt(value) - 100_000
+                p.TOTAL_VALUE >= parseInt(value) - 100_000,
         );
         const multiplier = index % 2 === 0 ? 1 : -1;
         const result = max / 2 + multiplier * Math.random() * range.length;
@@ -121,7 +121,7 @@
         let totalUnitsYear = d3.rollup(
             filteredPropertiesYear,
             (v) => v.length,
-            (d) => d.GIS_ID
+            (d) => d.GIS_ID,
         );
         filteredPropertiesYear = filteredPropertiesYear.map((property) => {
             let id = property.GIS_ID;
@@ -134,12 +134,12 @@
                 return incomeFilter === 1000000
                     ? true
                     : property.TOTAL_VALUE * 0.32 < incomeFilter;
-            }
+            },
         );
         let totalUnitsYearIncome = d3.rollup(
             filteredPropertiesYearIncome,
             (v) => v.length,
-            (d) => d.GIS_ID
+            (d) => d.GIS_ID,
         );
         let unique = {};
         filteredPropertiesYear = filteredPropertiesYear
@@ -183,7 +183,7 @@
                     number_affordable: _filteredPropertiesYearIncome.length,
                     median_value: d3.median(
                         _filteredPropertiesYear,
-                        (d) => d.TOTAL_VALUE
+                        (d) => d.TOTAL_VALUE,
                     ),
                 };
             }
@@ -231,7 +231,7 @@
                             r={radiusScale(property.totalUnitsYear)}
                             fill={colorScale(
                                 property.totalUnitsYearIncome /
-                                    property.totalUnitsYear
+                                    property.totalUnitsYear,
                             )}
                             fill-opacity="0.7"
                             stroke="white"
@@ -282,6 +282,29 @@
                         {/if}
                     {/each}
                 {/key}
+
+                {#each [10, 50, 120] as sz, index}
+                    <circle
+                        cx="50"
+                        cy={radiusScale ? 80 - radiusScale(sz) : 0}
+                        r={radiusScale ? radiusScale(sz) : 0}
+                        stroke="black"
+                        fill="none"
+                    ></circle>
+                    <line
+                        x1={radiusScale ? 50 + radiusScale(sz) : 0}
+                        x2="80"
+                        y1={radiusScale ? 80 - radiusScale(sz) : 0}
+                        y2={radiusScale ? 80 - radiusScale(sz) : 0}
+                        stroke="black"
+                    ></line>
+                    <text
+                        x="80"
+                        y={radiusScale ? 80 - radiusScale(sz) : 0}
+                        font-size="10"
+                        alignment-baseline="middle">{sz}</text
+                    >
+                {/each}
             </svg>
         </div>
         <div id="map_legend">
@@ -290,34 +313,8 @@
                 <div style="--color: {colorScale(color)}">{color * 100}%</div>
             {/each}
         </div>
-        <div id="size_legend">
-            <svg width="100" height="100">
-                {#each [10, 50, 120] as sz, index}
-                    <circle
-                        cx="50"
-                        cy={radiusScale ? 90 - radiusScale(sz) : 0}
-                        r={radiusScale ? radiusScale(sz) : 0}
-                        stroke="black"
-                        fill="none"
-                    ></circle>
-                    <line
-                        x1={radiusScale ? 50 + radiusScale(sz) : 0}
-                        x2="80"
-                        y1={radiusScale ? 90 - radiusScale(sz) : 0}
-                        y2={radiusScale ? 90 - radiusScale(sz) : 0}
-                        stroke="black"
-                    ></line>
-                    <text
-                        x="80"
-                        y={radiusScale ? 90 - radiusScale(sz) : 0}
-                        font-size="10"
-                        alignment-baseline="middle">{sz}</text
-                    >
-                {/each}
-            </svg>
-        </div>
         <div id="scatter">
-            <svg width="830" height="300">
+            <svg width="800" height="300">
                 <g transform="translate(10,10)">
                     <!-- X axis -->
                     <g
@@ -438,7 +435,7 @@
                                 opacity="0.5"
                                 fill={handleColor(
                                     property.TOTAL_VALUE,
-                                    incomeFilter
+                                    incomeFilter,
                                 )}
                             ></circle>
                         {/each}
@@ -484,7 +481,7 @@
     @import url("$lib/global.css");
 
     #mapone {
-        height: 500px;
+        height: 400px;
         width: 800px;
     }
 
