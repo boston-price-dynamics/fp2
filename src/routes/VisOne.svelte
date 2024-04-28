@@ -38,6 +38,7 @@
             property.totalUnits = totalUnits.get(id) ?? 0;
             return property;
         });
+
         // deduplicate
         // .filter((property) => {
         //     if (property.GIS_ID in unique) {
@@ -74,7 +75,23 @@
         });
     }
 
-    let index, offset, progress;
+    function handleCx(value) {
+        var x = d3.scaleLinear().domain([0, 5_000_000]).range([0, 460]);
+        return x(value);
+    }
+
+    function handleCy(value, index) {
+        var y = d3.scaleLinear().domain([0, 2000]).range([400, 0]);
+
+        const range = filteredPropertiesYear.filter(
+            (p) =>
+                p.TOTAL_VALUE <= parseInt(value) + 100_000 &&
+                p.TOTAL_VALUE >= parseInt(value) - 100_000,
+        );
+        const multiplier = index % 2 === 0 ? 1 : -1;
+        const result = 1000 + multiplier * Math.random() * range.length;
+        return y(result);
+    }
 
     $: map?.on("move", (evt) => mapViewChanged++);
 
@@ -257,6 +274,128 @@
                         {/if}
                     {/each}
                 {/key}
+            </svg>
+        </div>
+        <div id="scatter">
+            <svg width="460" height="400">
+                <g transform="translate(60, 10)">
+                    <!-- X AXIS -->
+                    <g
+                        transform="translate(0,360)"
+                        fill="none"
+                        font-size="10"
+                        font-family="sans-serif"
+                        text-anchor="middle"
+                    >
+                        <path
+                            class="domain"
+                            stroke="currentColor"
+                            d="M0,6V0H370V6"
+                        ></path>
+                        <g class="tick" opacity="1" transform="translate(0,0)"
+                            ><line stroke="currentColor" y2="6"></line><text
+                                fill="currentColor"
+                                y="9"
+                                dy="0.71em">0</text
+                            ></g
+                        ><g class="tick" opacity="1" transform="translate(37,0)"
+                            ><line stroke="currentColor" y2="6"></line><text
+                                fill="currentColor"
+                                y="9"
+                                dy="0.71em">0.5M</text
+                            ></g
+                        ><g class="tick" opacity="1" transform="translate(74,0)"
+                            ><line stroke="currentColor" y2="6"></line><text
+                                fill="currentColor"
+                                y="9"
+                                dy="0.71em">1M</text
+                            ></g
+                        ><g
+                            class="tick"
+                            opacity="1"
+                            transform="translate(111,0)"
+                            ><line stroke="currentColor" y2="6"></line><text
+                                fill="currentColor"
+                                y="9"
+                                dy="0.71em">1.5M</text
+                            ></g
+                        ><g
+                            class="tick"
+                            opacity="1"
+                            transform="translate(148,0)"
+                            ><line stroke="currentColor" y2="6"></line><text
+                                fill="currentColor"
+                                y="9"
+                                dy="0.71em">2M</text
+                            ></g
+                        ><g
+                            class="tick"
+                            opacity="1"
+                            transform="translate(185,0)"
+                            ><line stroke="currentColor" y2="6"></line><text
+                                fill="currentColor"
+                                y="9"
+                                dy="0.71em">2.5M</text
+                            ></g
+                        ><g
+                            class="tick"
+                            opacity="1"
+                            transform="translate(222,0)"
+                            ><line stroke="currentColor" y2="6"></line><text
+                                fill="currentColor"
+                                y="9"
+                                dy="0.71em">3M</text
+                            ></g
+                        ><g
+                            class="tick"
+                            opacity="1"
+                            transform="translate(259,0)"
+                            ><line stroke="currentColor" y2="6"></line><text
+                                fill="currentColor"
+                                y="9"
+                                dy="0.71em">3.5M</text
+                            ></g
+                        ><g
+                            class="tick"
+                            opacity="1"
+                            transform="translate(296,0)"
+                            ><line stroke="currentColor" y2="6"></line><text
+                                fill="currentColor"
+                                y="9"
+                                dy="0.71em">4M</text
+                            ></g
+                        ><g
+                            class="tick"
+                            opacity="1"
+                            transform="translate(333,0)"
+                            ><line stroke="currentColor" y2="6"></line><text
+                                fill="currentColor"
+                                y="9"
+                                dy="0.71em">4.5M</text
+                            ></g
+                        ><g
+                            class="tick"
+                            opacity="1"
+                            transform="translate(370,0)"
+                            ><line stroke="currentColor" y2="6"></line><text
+                                fill="currentColor"
+                                y="9"
+                                dy="0.71em">5M</text
+                            ></g
+                        >
+                    </g>
+                    <!-- SCATTER -->
+                    <g>
+                        {#each filteredPropertiesYear as property, index}
+                            <circle
+                                cx={handleCx(property.TOTAL_VALUE)}
+                                cy={handleCy(property.TOTAL_VALUE, index)}
+                                r="1.5"
+                                fill="#69b3a2"
+                            ></circle>
+                        {/each}
+                    </g>
+                </g>
             </svg>
         </div>
     </svelte:fragment>
