@@ -13,7 +13,7 @@
       const half = window.innerHeight / 2;
       const top = window.scrollY;
       opacity = top >= half ? 0 : (half - top) / half;
-      scale = (half + top) / half;
+      scale = top >= half ? 2 : (half + top) / half;
       scaleText = (half + top / 2) / half;
     });
   });
@@ -25,15 +25,14 @@
       
     </p> -->
     <h1 style={`transform: scale(${scaleText});`}>
-      Boston is facing a housing crisis, with the housing stock shrinking and
-      becoming pricier.
+      Boston's available housing stock is shrinking and becoming pricier.
       <br />
       <span class="yellow"
         >But instead of affordable housing, developers are choosing to target
         the <b>wealthy</b>.</span
       ><br />
       <span class="darkyellow"
-        >How have luxury developments impacted housing prices?</span
+        >How has focusing on luxury developments impacted housing prices?</span
       >
     </h1>
     <img
