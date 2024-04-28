@@ -143,7 +143,7 @@
 <VisOne />
 <!-- <LoremIpsum /> -->
 <h3>
-  <b>Evidently, developers overwhelmingly target wealthy buyers. </b>Much fewer
+  <b>Evidently, developers overwhelmingly target wealthy buyers.</b> Much fewer
   affordable units were built in the same timeframe. However, some argue that
   any new housing is good housing. The argument is that by increasing the
   housing supply (even with only luxury housing), savings would eventually
