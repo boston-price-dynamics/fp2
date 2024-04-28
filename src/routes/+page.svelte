@@ -3,7 +3,7 @@
   import "../../node_modules/mapbox-gl/dist/mapbox-gl.css";
   import { onMount } from "svelte";
   import * as d3 from "d3";
-  import { VERSION } from "svelte/compiler";
+  import VisOne from "./VisOne.svelte";
 
   mapboxgl.accessToken =
     "pk.eyJ1Ijoianlvb25zb25nIiwiYSI6ImNsdW95emJzMzIxMDQya3FwcXc1NzA4c2sifQ.C9_2pEU8Z00WnIWNndTg_Q";
@@ -124,6 +124,11 @@
 <nav>
   <h3>🏠</h3>
 </nav>
+<h3>
+  Boston <em>is</em> building new housing. But who is it actually for? What
+  fraction of new developments can <em>you</em> afford?
+</h3>
+<VisOne />
 <header>
   <div>
     <h4>
@@ -142,7 +147,7 @@
     {/if}
   </label>
 </header>
-<div id="map">
+<div id="map" class="map">
   <svg>
     {#key mapViewChanged}
       {#each filteredProperties as property, index}

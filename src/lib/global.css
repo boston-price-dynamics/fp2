@@ -1,11 +1,11 @@
 body {
-	font: 100%/1.5 system-ui, sans-serif;
-	display: flex;
-	flex-flow: column;
-	max-width: 80em;
-	min-height: 100vh;
-	box-sizing: border-box;
-	margin: auto;
+    font: 100%/1.5 system-ui, sans-serif;
+    display: flex;
+    flex-flow: column;
+    max-width: 80em;
+    min-height: 100vh;
+    box-sizing: border-box;
+    margin: auto;
     padding: 0 2em 2em;
 }
 
@@ -14,11 +14,11 @@ nav {
     border-bottom: 1px solid #ddd;
 }
 
-#map {
-	flex: 1;
+.map {
+    /* flex: 1; */
 }
 
-#map svg {
+.map svg {
     position: absolute;
     z-index: 1;
     width: 100%;
@@ -26,31 +26,37 @@ nav {
     pointer-events: none;
 }
 
-#map svg circle {
+.map svg circle {
     pointer-events: auto;
 }
 
 header {
     display: flex;
-    gap: 1em; 
+    gap: 1em;
     align-items: baseline;
     justify-content: space-between;
-} 
+}
+
 header h4 {
     margin-bottom: 3px;
 }
+
 header p {
     margin-top: 3px;
 }
+
 header label {
     margin-left: auto;
     color: #777;
 }
+
 header input {
     width: 370px;
     margin-top: 3px;
 }
-header year, header em {
+
+header year,
+header em {
     display: flex;
     justify-content: flex-end;
     margin-bottom: 20px;
