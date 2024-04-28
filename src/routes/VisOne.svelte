@@ -3,7 +3,8 @@
     import "../../node_modules/mapbox-gl/dist/mapbox-gl.css";
     import { onMount } from "svelte";
     import * as d3 from "d3";
-    import Page from "./+page.svelte";
+    import Scrolly from "svelte-scrolly";
+
     mapboxgl.accessToken =
         "pk.eyJ1Ijoianlvb25zb25nIiwiYSI6ImNsdW95emJzMzIxMDQya3FwcXc1NzA4c2sifQ.C9_2pEU8Z00WnIWNndTg_Q";
 
@@ -16,8 +17,8 @@
         map = new mapboxgl.Map({
             container: "mapone",
             style: "mapbox://styles/jyoonsong/cluq04ktu05cr01qqb4rp4v4f",
-            center: [-71.09415, 42.36027],
-            zoom: 12,
+            center: [-71.1007596, 42.3149367],
+            zoom: 11,
         });
         await new Promise((resolve) => map.on("load", resolve));
 
@@ -65,7 +66,6 @@
     }
 
     function handleMouseOver(index) {
-        console.log(index);
         hoverSignals = hoverSignals.map((item, i) => {
             if (i === index) {
                 return true;
@@ -74,33 +74,60 @@
         });
     }
 
-    $: hoverSignals = mappedProperties?.map(() => false);
+    let index, offset, progress;
 
     $: map?.on("move", (evt) => mapViewChanged++);
 
     let incomeFilter = 100000;
-    let yearFilter = 2000;
 
-    $: filteredProperties = properties.filter((property) => {
-        return (
-            property.YR_BUILT == yearFilter &&
-            property.TOTAL_VALUE * 0.32 < incomeFilter
-        );
-    });
+    let progressToYearScale = d3
+        .scaleLinear()
+        .domain([0, 100])
+        .rangeRound([2000, 2022]);
+    $: yearFilter = progressToYearScale(yearProgress);
 
-    let mappedProperties = [];
+    let years = [];
+    for (let year = 2000; year <= 2022; year++) {
+        years.push(year);
+    }
 
+    let filteredPropertiesYear;
+    let filteredPropertiesYearIncome;
+    let hoverSignals;
+    let yearProgress;
     $: {
-        let totalFilteredUnits = d3.rollup(
-            filteredProperties,
+        filteredPropertiesYear = properties.filter((property) => {
+            return property.YR_BUILT == yearFilter;
+        });
+        let totalUnitsYear = d3.rollup(
+            filteredPropertiesYear,
+            (v) => v.length,
+            (d) => d.GIS_ID,
+        );
+        filteredPropertiesYear = filteredPropertiesYear.map((property) => {
+            let id = property.GIS_ID;
+            property.totalUnitsYear = totalUnitsYear.get(id) ?? 0;
+            return property;
+        });
+
+        filteredPropertiesYearIncome = filteredPropertiesYear.filter(
+            (property) => {
+                return incomeFilter === 1000000
+                    ? true
+                    : property.TOTAL_VALUE * 0.32 < incomeFilter;
+            },
+        );
+        let totalUnitsYearIncome = d3.rollup(
+            filteredPropertiesYearIncome,
             (v) => v.length,
             (d) => d.GIS_ID,
         );
         let unique = {};
-        mappedProperties = filteredProperties
+        filteredPropertiesYear = filteredPropertiesYear
             .map((property) => {
                 let id = property.GIS_ID;
-                property.totalFilteredUnits = totalFilteredUnits.get(id) ?? 0;
+                property.totalUnitsYearIncome =
+                    totalUnitsYearIncome.get(id) ?? 0;
                 return property;
             })
             .filter((property) => {
@@ -110,76 +137,177 @@
                 unique[property.GIS_ID] = true;
                 return true;
             });
+
+        hoverSignals = filteredPropertiesYear?.map(() => false);
     }
+
+    let colorScale = d3.scaleLinear().domain([0, 1]).range(["red", "green"]);
+
+    let statsByYear = {};
+    $: {
+        for (let year of years) {
+            if (Math.abs(year - yearFilter) < 2) {
+                let _filteredPropertiesYear = properties.filter((property) => {
+                    return property.YR_BUILT == year;
+                });
+                let _filteredPropertiesYearIncome =
+                    _filteredPropertiesYear.filter((property) => {
+                        return incomeFilter === 1000000
+                            ? true
+                            : property.TOTAL_VALUE * 0.32 < incomeFilter;
+                    });
+                statsByYear[year] = {
+                    number_built: _filteredPropertiesYear.length,
+                    number_affordable: _filteredPropertiesYearIncome.length,
+                    median_value: d3.median(
+                        _filteredPropertiesYear,
+                        (d) => d.TOTAL_VALUE,
+                    ),
+                };
+            }
+        }
+    }
+    let USDollar = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 0,
+    });
 </script>
 
-<header>
-    <div>Test</div>
-    <label>
-        Enter your annual income:
-        <input type="range" min="0" max="1000000" bind:value={incomeFilter} />
-        {#if incomeFilter === 1000000}
-            <year>$1,000,000+</year>
-        {:else}
-            <year>${incomeFilter}</year>
-        {/if}
-    </label>
-    <label>
-        Year (replace with scrolly):
-        <input type="range" min="2000" max="2022" bind:value={yearFilter} />
-        <year>{yearFilter}</year>
-    </label>
-</header>
-<div id="mapone" class="map">
-    <svg>
-        {#key mapViewChanged}
-            {#each mappedProperties as property, index}
-                <circle
-                    {...getCoords(property)}
-                    r={radiusScale(property.totalUnits)}
-                    fill="green"
-                    fill-opacity={property.totalFilteredUnits /
-                        property.totalUnits}
-                    stroke="white"
-                    on:mouseover={() => handleMouseOver(index)}
-                    on:mouseleave={() => handleMouseOver(-1)}
-                >
-                </circle>
-            {/each}
-        {/key}
-
-        {#key mapViewChanged}
-            {#each mappedProperties as property, index}
-                {#if hoverSignals[index] === true}
-                    <rect
-                        {...getTextCoords(property)}
-                        width="250"
-                        height="120"
-                        fill="rgba(0,0,0,0.8)"
-                    >
-                    </rect>
-                    <text {...getTextCoords(property)} fill="#fff">
-                        <tspan {...getTextCoords(property)} dx="1em" dy="2em"
-                            >{property.ST_NUM}
-                            {property.ST_NAME}, {property.CITY}</tspan
-                        >
-                        <tspan {...getTextCoords(property)} dx="1em" dy="3.75em"
-                            >Built: {property.YR_BUILT}</tspan
-                        >
-                        <tspan {...getTextCoords(property)} dx="1em" dy="5.25em"
-                            >Number of Units: {property.totalUnits}</tspan
-                        >
-                    </text>
+<Scrolly
+    bind:progress={yearProgress}
+    --scrolly-layout="viz-first"
+    threshold="0"
+>
+    <svelte:fragment slot="viz">
+        <header>
+            <div>{yearFilter}</div>
+            <label>
+                Enter your annual income:
+                <input
+                    type="range"
+                    min="0"
+                    max="1000000"
+                    bind:value={incomeFilter}
+                />
+                {#if incomeFilter === 1000000}
+                    <year>$1,000,000+</year>
+                {:else}
+                    <year>{USDollar.format(incomeFilter)}</year>
                 {/if}
-            {/each}
-        {/key}
-    </svg>
-</div>
+            </label>
+        </header>
+        <div id="mapone" class="map">
+            <svg>
+                {#key mapViewChanged}
+                    {#each filteredPropertiesYear as property, index}
+                        <circle
+                            {...getCoords(property)}
+                            r={radiusScale(property.totalUnitsYear)}
+                            fill={colorScale(
+                                property.totalUnitsYearIncome /
+                                    property.totalUnitsYear,
+                            )}
+                            fill-opacity={1}
+                            stroke="white"
+                            on:mouseover={() => handleMouseOver(index)}
+                            on:mouseleave={() => handleMouseOver(-1)}
+                        >
+                        </circle>
+                    {/each}
+                {/key}
+
+                {#key mapViewChanged}
+                    {#each filteredPropertiesYear as property, index}
+                        {#if hoverSignals[index] === true}
+                            <rect
+                                {...getTextCoords(property)}
+                                width="250"
+                                height="120"
+                                fill="rgba(0,0,0,0.8)"
+                            >
+                            </rect>
+                            <text {...getTextCoords(property)} fill="#fff">
+                                <tspan
+                                    {...getTextCoords(property)}
+                                    dx="1em"
+                                    dy="2em"
+                                    >{property.ST_NUM}
+                                    {property.ST_NAME}, {property.CITY}</tspan
+                                >
+                                <tspan
+                                    {...getTextCoords(property)}
+                                    dx="1em"
+                                    dy="3.75em"
+                                    >Built: {property.YR_BUILT}</tspan
+                                >
+                                <tspan
+                                    {...getTextCoords(property)}
+                                    dx="1em"
+                                    dy="5.25em"
+                                    ># Units: {property.totalUnitsYear}</tspan
+                                >
+                                <tspan
+                                    {...getTextCoords(property)}
+                                    dx="1em"
+                                    dy="6.75em"
+                                    ># Units Afforded: {property.totalUnitsYearIncome}</tspan
+                                >
+                            </text>
+                        {/if}
+                    {/each}
+                {/key}
+            </svg>
+        </div>
+    </svelte:fragment>
+    <div>
+        {#each years as year, index}
+            <section>
+                <h1>{year}</h1>
+                <div class="stat">
+                    <p>New units built:</p>
+                    <h2>{statsByYear[year]?.number_built}</h2>
+                </div>
+                <div class="stat">
+                    <p>New units you can afford:</p>
+                    <h2>{statsByYear[year]?.number_affordable}</h2>
+                </div>
+                <div class="stat">
+                    <p>% units you can afford:</p>
+                    <h2>
+                        {(
+                            (statsByYear[year]?.number_affordable /
+                                statsByYear[year]?.number_built) *
+                            100
+                        ).toLocaleString(undefined, {
+                            maximumFractionDigits: 2,
+                        })}%
+                    </h2>
+                </div>
+                <div class="stat">
+                    <p>Median unit price:</p>
+                    <h2>{USDollar.format(statsByYear[year]?.median_value)}</h2>
+                </div>
+            </section>
+        {/each}
+    </div>
+</Scrolly>
 
 <style>
     @import url("$lib/global.css");
 
     #mapone {
         height: 500px;
+        width: 800px;
+    }
+
+    section {
+        padding-top: 50px;
+        padding-bottom: 300px;
+    }
+
+    section h1 {
+        font-size: 100px;
+        margin: 0;
     }
 </style>

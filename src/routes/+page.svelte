@@ -4,6 +4,7 @@
   import { onMount } from "svelte";
   import * as d3 from "d3";
   import VisOne from "./VisOne.svelte";
+  import LoremIpsum from "./LoremIpsum.svelte";
 
   mapboxgl.accessToken =
     "pk.eyJ1Ijoianlvb25zb25nIiwiYSI6ImNsdW95emJzMzIxMDQya3FwcXc1NzA4c2sifQ.C9_2pEU8Z00WnIWNndTg_Q";
@@ -129,7 +130,9 @@
   fraction of new developments can <em>you</em> afford?
 </h3>
 <VisOne />
-<header>
+<LoremIpsum />
+
+<!-- <header>
   <div>
     <h4>
       Boston Luxury Developments (Total Assessed Value > $10m, Average Assessed
@@ -202,7 +205,7 @@
       {/each}
     {/key}
   </svg>
-</div>
+</div> -->
 
 <style>
   @import url("$lib/global.css");
