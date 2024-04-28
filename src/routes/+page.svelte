@@ -1,233 +1,80 @@
 <script>
-  import mapboxgl from "mapbox-gl";
   import "../../node_modules/mapbox-gl/dist/mapbox-gl.css";
   import { onMount } from "svelte";
-  import * as d3 from "d3";
   import VisOne from "./VisOne.svelte";
   import LoremIpsum from "./LoremIpsum.svelte";
 
-  mapboxgl.accessToken =
-    "pk.eyJ1Ijoianlvb25zb25nIiwiYSI6ImNsdW95emJzMzIxMDQya3FwcXc1NzA4c2sifQ.C9_2pEU8Z00WnIWNndTg_Q";
-
-  let map;
-  let mapViewChanged = 0;
-
-  let properties = [];
-  let radiusScale;
-  let opacityScale;
-
-  let yearFilter = 1950;
-
-  function getCoords(property) {
-    let point = new mapboxgl.LngLat(+property.lon, +property.lat);
-    let { x, y } = map.project(point);
-    return { cx: x, cy: y };
-  }
-
-  function getTextCoords(property) {
-    let point = new mapboxgl.LngLat(+property.lon, +property.lat);
-    let { x, y } = map.project(point);
-    return { x: x, y: y };
-  }
-
-  function handleMouseOver(index) {
-    console.log(index);
-    hoverSignals = hoverSignals.map((item, i) => {
-      if (i === index) {
-        return true;
-      }
-      return false;
-    });
-  }
-
-  $: map?.on("move", (evt) => mapViewChanged++);
-
-  $: filteredProperties =
-    yearFilter === 1950
-      ? properties
-      : properties.filter((property) => {
-          return property.YR_BUILT <= yearFilter;
-        });
-
-  $: opacityScale = d3
-    .scalePow(3)
-    .domain([
-      yearFilter === 1950 ? 1850 : yearFilter - 100,
-      yearFilter === 1950 ? 2024 : yearFilter,
-    ])
-    .range([0.05, 0.75]);
-
-  $: hoverSignals = filteredProperties?.map(() => false);
+  let opacity = 1;
+  let scale = 1;
+  let scaleText = 1;
 
   onMount(async () => {
-    map = new mapboxgl.Map({
-      container: "map",
-      style: "mapbox://styles/jyoonsong/cluq04ktu05cr01qqb4rp4v4f",
-      center: [-71.09415, 42.36027],
-      zoom: 12,
+    document.addEventListener("scroll", (e) => {
+      const half = window.innerHeight / 2;
+      const top = window.scrollY;
+      opacity = top >= half ? 0 : (half - top) / half;
+      scale = (half + top) / half;
+      scaleText = (half + top / 2) / half;
     });
-    await new Promise((resolve) => map.on("load", resolve));
-
-    properties = await d3.csv(
-      "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/assess_lat_long.csv",
-    );
-
-    properties.forEach((el) => {
-      el.TOTAL_VALUE = +el.TOTAL_VALUE;
-    });
-
-    let totalValue = d3.rollup(
-      properties,
-      (v) => d3.sum(v, (d) => d.TOTAL_VALUE),
-      (d) => d.GIS_ID,
-    );
-
-    let totalUnits = d3.rollup(
-      properties,
-      (v) => v.length,
-      (d) => d.GIS_ID,
-    );
-
-    let unique = {};
-    properties = properties
-      .map((property) => {
-        let id = property.GIS_ID;
-        property.totalValue = totalValue.get(id) ?? 0;
-        property.totalUnits = totalUnits.get(id) ?? 0;
-        return property;
-      })
-      // deduplicate
-      .filter((property) => {
-        if (property.GIS_ID in unique) {
-          return false;
-        }
-        unique[property.GIS_ID] = true;
-        return true;
-      });
-
-    properties = properties.filter((property) => {
-      return (
-        property.totalValue > 100_000_000 &&
-        property.totalValue / property.totalUnits > 1_000_000
-      );
-    });
-    console.log(properties);
-
-    radiusScale = d3
-      .scaleSqrt()
-      .domain([0, d3.max(properties, (d) => d.totalValue)])
-      .range([0, 40]);
-
-    // let totalUnits = d3.rollup(properties);
   });
 </script>
 
-<nav>
-  <h3>🏠</h3>
-</nav>
-<h3>
-  <b>The Greater Boston area is, undeniably, undergoing a housing crisis.</b>
-  Bostonians are finding it harder and harder to find available - and affordable
-  - housing, forcing some to leave the area entirely. Despite this, the area is simultaneously
-  undergoing a sort of housing boom, with new high-rises redefining the city's skyline.
-  So, Boston
-  <em>is</em>
-  building new housing.
-  <b
-    >But who is it actually for? What fraction of new developments can <em
-      >you</em
-    > afford?</b
-  >
-</h3>
-<div class="sep"></div>
-<VisOne />
-<!-- <LoremIpsum /> -->
-<h3>
-  <b>Evidently, developers overwhelmingly target wealthy buyers.</b> Much fewer
-  affordable units were built in the same timeframe. However, some argue that
-  any new housing is good housing. The argument is that by increasing the
-  housing supply (even with only luxury housing), savings would eventually
-  trickle down to all homebuyers.
-  <b
-    >But, is this true? How have luxury developments in Boston affected house
-    prices in their surrounding neighborhoods?</b
-  >
-</h3>
-
-<!-- <header>
-  <div>
-    <h4>
-      Boston Luxury Developments (Total Assessed Value > $10m, Average Assessed
-      Value > $1m)
-    </h4>
-    <p>Assessed Values</p>
+<main>
+  <div class="title">
+    <!-- <p>
+      
+    </p> -->
+    <h1 style={`transform: scale(${scaleText});`}>
+      Boston is facing a housing crisis, with the housing stock shrinking and
+      becoming pricier.
+      <br />
+      <span class="yellow"
+        >But instead of affordable housing, developers are choosing to target
+        the <b>wealthy</b>.</span
+      ><br />
+      <span class="darkyellow"
+        >How have luxury developments impacted housing prices?</span
+      >
+    </h1>
+    <img
+      class="bg"
+      src="background.jpg"
+      style={`opacity: ${opacity}; transform: scale(${scale});`}
+      alt="bg"
+    />
   </div>
-  <label>
-    Year:
-    <input type="range" min="1950" max="2024" bind:value={yearFilter} />
-    {#if yearFilter === 1950}
-      <em>(any year)</em>
-    {:else}
-      <year>{yearFilter}</year>
-    {/if}
-  </label>
-</header>
-<div id="map" class="map">
-  <svg>
-    {#key mapViewChanged}
-      {#each filteredProperties as property, index}
-        <circle
-          {...getCoords(property)}
-          r={radiusScale(property.totalValue)}
-          fill={hoverSignals[index] === true ? "green" : "#FFBB05"}
-          fill-opacity={hoverSignals[index]
-            ? 0.8
-            : opacityScale(property.YR_BUILT)}
-          stroke="white"
-          on:mouseover={() => handleMouseOver(index)}
-          on:mouseleave={() => handleMouseOver(-1)}
-        >
-        </circle>
-      {/each}
-    {/key}
+</main>
+<div class="wrapper">
+  <h3>
+    <b>The Greater Boston area is, undeniably, undergoing a housing crisis.</b>
+    Bostonians are finding it harder and harder to find available - and affordable
+    - housing, forcing some to leave the area entirely. Despite this, the area is
+    simultaneously undergoing a sort of housing boom, with new high-rises redefining
+    the city's skyline. So, Boston
+    <em>is</em>
+    building new housing.
+    <b
+      >But who is it actually for? What fraction of new developments can <em
+        >you</em
+      > afford?</b
+    >
+  </h3>
+  <div class="sep"></div>
+  <VisOne />
 
-    {#key mapViewChanged}
-      {#each filteredProperties as property, index}
-        {#if hoverSignals[index] === true}
-          <rect
-            {...getTextCoords(property)}
-            width="250"
-            height="120"
-            fill="rgba(0,0,0,0.8)"
-          >
-          </rect>
-          <text {...getTextCoords(property)} fill="#fff">
-            <tspan {...getTextCoords(property)} dx="1em" dy="2em"
-              >{property.ST_NUM} {property.ST_NAME}, {property.CITY}</tspan
-            >
-            <tspan {...getTextCoords(property)} dx="1em" dy="3.75em"
-              >Built: {property.YR_BUILT}</tspan
-            >
-            <tspan {...getTextCoords(property)} dx="1em" dy="5.25em"
-              >Number of Units: {property.totalUnits}</tspan
-            >
-            <tspan {...getTextCoords(property)} dx="1em" dy="6.75em"
-              >Average Assessed Value: ${(
-                property.totalValue / property.totalUnits
-              ).toLocaleString(undefined, { maximumFractionDigits: 0 })}</tspan
-            >
-            <tspan {...getTextCoords(property)} dx="1em" dy="8.25em"
-              >Total Assessed Value: ${property.totalValue.toLocaleString(
-                undefined,
-                { maximumFractionDigits: 0 },
-              )}</tspan
-            >
-          </text>
-        {/if}
-      {/each}
-    {/key}
-  </svg>
-</div> -->
+  <!-- <LoremIpsum /> -->
+  <h3>
+    <b>Evidently, developers overwhelmingly target wealthy buyers.</b> Much
+    fewer affordable units were built in the same timeframe. However, some argue
+    that any new housing is good housing. The argument is that by increasing the
+    housing supply (even with only luxury housing), savings would eventually
+    trickle down to all homebuyers.
+    <b
+      >But, is this true? How have luxury developments in Boston affected house
+      prices in their surrounding neighborhoods?</b
+    >
+  </h3>
+</div>
 
 <style>
   @import url("$lib/global.css");
