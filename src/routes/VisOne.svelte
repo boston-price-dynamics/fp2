@@ -452,30 +452,34 @@
     <div>
         {#each years as year, index}
             <section>
-                <h1>{year}</h1>
-                <div class="stat">
-                    <p>New units built:</p>
-                    <h2>{statsByYear[year]?.number_built}</h2>
-                </div>
-                <div class="stat">
-                    <p>New units you can afford:</p>
-                    <h2>{statsByYear[year]?.number_affordable}</h2>
-                </div>
-                <div class="stat">
-                    <p>% units you can afford:</p>
-                    <h2>
-                        {(
-                            (statsByYear[year]?.number_affordable /
-                                statsByYear[year]?.number_built) *
-                            100
-                        ).toLocaleString(undefined, {
-                            maximumFractionDigits: 2,
-                        })}%
-                    </h2>
-                </div>
-                <div class="stat">
-                    <p>Median new unit price:</p>
-                    <h2>{USDollar.format(statsByYear[year]?.median_value)}</h2>
+                <div class="info">
+                    <h1>{year}</h1>
+                    <div class="stat">
+                        <p>New units built:</p>
+                        <h2>{statsByYear[year]?.number_built}</h2>
+                    </div>
+                    <div class="stat">
+                        <p>New units you can afford:</p>
+                        <h2>{statsByYear[year]?.number_affordable}</h2>
+                    </div>
+                    <div class="stat">
+                        <p>% units you can afford:</p>
+                        <h2>
+                            {(
+                                (statsByYear[year]?.number_affordable /
+                                    statsByYear[year]?.number_built) *
+                                100
+                            ).toLocaleString(undefined, {
+                                maximumFractionDigits: 2,
+                            })}%
+                        </h2>
+                    </div>
+                    <div class="stat">
+                        <p>Median new unit price:</p>
+                        <h2>
+                            {USDollar.format(statsByYear[year]?.median_value)}
+                        </h2>
+                    </div>
                 </div>
             </section>
         {/each}
