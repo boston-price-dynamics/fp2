@@ -21,12 +21,23 @@
 
 <main>
     <div class="title">
+        <p>
+            <b
+                >The Greater Boston area is, undeniably, undergoing a housing
+                crisis.</b
+            >
+            Bostonians are finding it harder and harder to find available - and affordable
+            - housing, forcing some to leave the area entirely. Despite this, the
+            area is simultaneously undergoing a sort of housing boom, with new high-rises
+            redefining the city's skyline.
+        </p>
         <h1 style={`transform: scale(${scaleText});`}>
-            <span class="darkyellow"
-                >Boston <em>is</em> building new housing.
-            </span><br />
+            So, Boston <em>is</em> building new housing.
+            <br />
             <span class="yellow">But who is it actually for?</span><br />
-            What fraction of new developments can <em>you</em> afford?
+            <span class="darkyellow"
+                >What fraction of new developments can <em>you</em> afford?</span
+            >
         </h1>
         <img
             class="bg"
@@ -38,8 +49,21 @@
 </main>
 <div class="wrapper">
     <VisOne />
+
+    <!-- <LoremIpsum /> -->
+    <h3>
+        <b>Evidently, developers overwhelmingly target wealthy buyers. </b> Much
+        fewer affordable units were built in the same timeframe. However, some
+        argue that any new housing is good housing. The argument is that by
+        increasing the housing supply (even with only luxury housing), savings
+        would eventually trickle down to all homebuyers.
+        <b
+            >But, is this true? How have luxury developments in Boston affected
+            house prices in their surrounding neighborhoods?</b
+        >
+    </h3>
 </div>
-<LoremIpsum />
+<div class="sep"></div>
 
 <style>
     @import url("$lib/global.css");

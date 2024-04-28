@@ -23,13 +23,13 @@
         await new Promise((resolve) => map.on("load", resolve));
 
         properties = await d3.csv(
-            "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/assess_lat_long.csv"
+            "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/assess_lat_long.csv",
         );
 
         let totalUnits = d3.rollup(
             properties,
             (v) => v.length,
-            (d) => d.GIS_ID
+            (d) => d.GIS_ID,
         );
 
         properties = properties.map((property) => {
@@ -77,7 +77,7 @@
         const range = filteredPropertiesByYear.filter(
             (p) =>
                 p.TOTAL_VALUE <= parseInt(value) + 100_000 &&
-                p.TOTAL_VALUE >= parseInt(value) - 100_000
+                p.TOTAL_VALUE >= parseInt(value) - 100_000,
         );
         const multiplier = index % 2 === 0 ? 1 : -1;
         const result = max / 2 + multiplier * Math.random() * range.length;
@@ -121,11 +121,17 @@
         let totalUnitsYear = d3.rollup(
             filteredPropertiesYear,
             (v) => v.length,
-            (d) => d.GIS_ID
+            (d) => d.GIS_ID,
+        );
+        let totalValueYear = d3.rollup(
+            filteredPropertiesYear,
+            (v) => d3.sum(v, (d) => d.TOTAL_VALUE),
+            (d) => d.GIS_ID,
         );
         filteredPropertiesYear = filteredPropertiesYear.map((property) => {
             let id = property.GIS_ID;
             property.totalUnitsYear = totalUnitsYear.get(id) ?? 0;
+            property.totalValueYear = totalValueYear.get(id) ?? 0;
             return property;
         });
 
@@ -134,12 +140,12 @@
                 return incomeFilter === 1000000
                     ? true
                     : property.TOTAL_VALUE * 0.32 < incomeFilter;
-            }
+            },
         );
         let totalUnitsYearIncome = d3.rollup(
             filteredPropertiesYearIncome,
             (v) => v.length,
-            (d) => d.GIS_ID
+            (d) => d.GIS_ID,
         );
         let unique = {};
         filteredPropertiesYear = filteredPropertiesYear
@@ -183,7 +189,7 @@
                     number_affordable: _filteredPropertiesYearIncome.length,
                     median_value: d3.median(
                         _filteredPropertiesYear,
-                        (d) => d.TOTAL_VALUE
+                        (d) => d.TOTAL_VALUE,
                     ),
                 };
             }
@@ -205,7 +211,7 @@
         <header>
             <div>
                 <h4>New Developments in Boston in {yearFilter}</h4>
-                <p>Source: Boston Property Assessment Data</p>
+                <p>One Dot per Development</p>
             </div>
             <label>
                 Enter your annual income:
@@ -231,7 +237,7 @@
                             r={radiusScale(property.totalUnitsYear)}
                             fill={colorScale(
                                 property.totalUnitsYearIncome /
-                                    property.totalUnitsYear
+                                    property.totalUnitsYear,
                             )}
                             fill-opacity="0.7"
                             stroke="white"
@@ -264,20 +270,36 @@
                                     {...getTextCoords(property)}
                                     dx="1em"
                                     dy="3.75em"
-                                    >Built: {property.YR_BUILT}</tspan
+                                    >New units built: {property.totalUnitsYear}</tspan
                                 >
                                 <tspan
                                     {...getTextCoords(property)}
                                     dx="1em"
                                     dy="5.25em"
-                                    ># Units: {property.totalUnitsYear}</tspan
+                                    >New units you can afford: {property.totalUnitsYearIncome}</tspan
                                 >
                                 <tspan
                                     {...getTextCoords(property)}
                                     dx="1em"
                                     dy="6.75em"
-                                    ># Units Afforded: {property.totalUnitsYearIncome}</tspan
+                                    >% units you can afford: {(
+                                        (property.totalUnitsYearIncome /
+                                            property.totalUnitsYear) *
+                                        100
+                                    ).toLocaleString(undefined, {
+                                        maximumFractionDigits: 2,
+                                    })}%</tspan
                                 >
+                                <tspan
+                                    {...getTextCoords(property)}
+                                    dx="1em"
+                                    dy="8.25em"
+                                    >Average new unit price:
+                                    {USDollar.format(
+                                        property.totalValueYear /
+                                            property.totalUnitsYear,
+                                    )}
+                                </tspan>
                             </text>
                         {/if}
                     {/each}
@@ -427,7 +449,8 @@
                         <text
                             transform="translate(380,37)"
                             fill="#000"
-                            style="font-size: 12px;">House Price</text
+                            style="font-size: 12px;"
+                            >House Price (One Dot per Unit)</text
                         >
                     </g>
                     <!-- SCATTER -->
@@ -440,7 +463,7 @@
                                 opacity="0.5"
                                 fill={handleColor(
                                     property.TOTAL_VALUE,
-                                    incomeFilter
+                                    incomeFilter,
                                 )}
                             ></circle>
                         {/each}
