@@ -4,6 +4,8 @@
   import VisOne from "./VisOne.svelte";
   import VisThree from "./VisThree.svelte";
   import LoremIpsum from "./LoremIpsum.svelte";
+  import VisTwo from "./VisTwo.svelte";
+
   let opacity = 1;
   let scale = 1;
   let scaleText = 1;
@@ -65,7 +67,7 @@
   <VisOne />
 
   <!-- <LoremIpsum /> -->
-  <div class="intro">
+  <div class="content">
     <h3>
       <b>Evidently, developers overwhelmingly target wealthy buyers.</b>
       Much fewer affordable units were built in the same timeframe. However, some
@@ -79,7 +81,9 @@
     </h3>
   </div>
 
-  <div class="intro">
+  <VisTwo />
+
+  <div class="content">
     <h3>
       <b>
         It's clear from these case studies that the construction of luxury
@@ -98,7 +102,7 @@
   </div>
   <VisThree />
 
-  <div class="intro">
+  <div class="content">
     <h3>
       In summary, our analysis shows that<br />
       1) In the past few decades, Boston developers are constructing
@@ -112,7 +116,7 @@
       3) As a result,
       <b>home prices are rapidly outpacing household incomes</b>, worsening the
       affordability crisis.<br /><br />
-      More housing - and specifically, more affordable housing - are critically needed.
+      More housing - and specifically, more affordable housing - is critically needed.
     </h3>
   </div>
 </div>
