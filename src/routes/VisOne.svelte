@@ -23,13 +23,13 @@
         await new Promise((resolve) => map.on("load", resolve));
 
         properties = await d3.csv(
-            "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/assess_lat_long.csv"
+            "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/assess_lat_long.csv",
         );
 
         let totalUnits = d3.rollup(
             properties,
             (v) => v.length,
-            (d) => d.GIS_ID
+            (d) => d.GIS_ID,
         );
 
         properties = properties.map((property) => {
@@ -42,6 +42,9 @@
             .scaleSqrt()
             .domain([0, d3.max(properties, (d) => d.totalUnits)])
             .range([0, 50]);
+
+        incomes = await d3.csv("../income_dist.csv");
+        console.log(incomes);
     });
 
     function getCoords(property) {
@@ -77,7 +80,7 @@
         const range = filteredPropertiesByYear.filter(
             (p) =>
                 p.TOTAL_VALUE <= parseInt(value) + 100_000 &&
-                p.TOTAL_VALUE >= parseInt(value) - 100_000
+                p.TOTAL_VALUE >= parseInt(value) - 100_000,
         );
         const multiplier = index % 2 === 0 ? 1 : -1;
         const result = max / 2 + multiplier * Math.random() * range.length;
@@ -121,12 +124,12 @@
         let totalUnitsYear = d3.rollup(
             filteredPropertiesYear,
             (v) => v.length,
-            (d) => d.GIS_ID
+            (d) => d.GIS_ID,
         );
         let totalValueYear = d3.rollup(
             filteredPropertiesYear,
             (v) => d3.sum(v, (d) => d.TOTAL_VALUE),
-            (d) => d.GIS_ID
+            (d) => d.GIS_ID,
         );
         filteredPropertiesYear = filteredPropertiesYear.map((property) => {
             let id = property.GIS_ID;
@@ -140,12 +143,12 @@
                 return incomeFilter === 1000000
                     ? true
                     : property.TOTAL_VALUE * 0.32 < incomeFilter;
-            }
+            },
         );
         let totalUnitsYearIncome = d3.rollup(
             filteredPropertiesYearIncome,
             (v) => v.length,
-            (d) => d.GIS_ID
+            (d) => d.GIS_ID,
         );
         let unique = {};
         filteredPropertiesYear = filteredPropertiesYear
@@ -189,7 +192,7 @@
                     number_affordable: _filteredPropertiesYearIncome.length,
                     median_value: d3.median(
                         _filteredPropertiesYear,
-                        (d) => d.TOTAL_VALUE
+                        (d) => d.TOTAL_VALUE,
                     ),
                 };
             }
@@ -214,7 +217,7 @@
                 <p>One Dot per Development</p>
             </div>
             <label>
-                Enter your annual income:
+                Enter your annual household income:
                 <input
                     type="range"
                     min="0"
@@ -259,7 +262,7 @@
                             r={radiusScale(property.totalUnitsYear)}
                             fill={colorScale(
                                 property.totalUnitsYearIncome /
-                                    property.totalUnitsYear
+                                    property.totalUnitsYear,
                             )}
                             fill-opacity="0.7"
                             stroke="white"
@@ -319,7 +322,7 @@
                                     >Average new unit price:
                                     {USDollar.format(
                                         property.totalValueYear /
-                                            property.totalUnitsYear
+                                            property.totalUnitsYear,
                                     )}
                                 </tspan>
                             </text>
@@ -485,7 +488,7 @@
                                 opacity="0.5"
                                 fill={handleColor(
                                     property.TOTAL_VALUE,
-                                    incomeFilter
+                                    incomeFilter,
                                 )}
                             ></circle>
                         {/each}
