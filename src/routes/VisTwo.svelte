@@ -38,7 +38,7 @@
             row.dt = new Date(row.date);
         });
 
-        buildings = await d3.csv("/full_years.csv");
+        buildings = await d3.csv("full_years.csv");
     });
 
     let timelineProgress = 100;
