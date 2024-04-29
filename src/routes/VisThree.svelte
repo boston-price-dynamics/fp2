@@ -347,7 +347,7 @@
                     <path
                         id="income"
                         fill="none"
-                        stroke="#1a9850"
+                        stroke="#37b7e1"
                         stroke-width="3"
                         d={handleLine(data, "Mass. median household income")}
                     ></path>
@@ -371,6 +371,13 @@
                         "Mass. condos median sales price"
                     )}%</strong
                 >
+            </div>
+            <div
+                class="label explanation"
+                style={`opacity: ${((progress - 70) / 100) * 3}`}
+            >
+                The increase of house sales price is much faster than the
+                increase of household income
             </div>
             <div class="label">
                 Percent change in median household income in Mass. from 2000 to {progress >=
