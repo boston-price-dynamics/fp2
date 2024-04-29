@@ -552,11 +552,17 @@
                     <h1>{year}</h1>
                     <div class="stat">
                         <p>New units built:</p>
-                        <h2>{statsByYear[year]?.number_built}</h2>
+                        <h2>
+                            {(statsByYear[year]?.number_built).toLocaleString()}
+                        </h2>
                     </div>
                     <div class="stat">
                         <p>New units you can afford:</p>
-                        <h2>{statsByYear[year]?.number_affordable}</h2>
+                        <h2>
+                            {(statsByYear[
+                                year
+                            ]?.number_affordable).toLocaleString()}
+                        </h2>
                     </div>
                     <div class="stat">
                         <p>% units you can afford:</p>
