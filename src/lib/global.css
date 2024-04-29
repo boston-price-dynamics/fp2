@@ -79,18 +79,22 @@ main {
 .content h3 b:nth-of-type(2) {
     background-color: #ffee91;
 }
+
 .content {
     display: flex;
     align-items: center;
-    justify-content: center; 
+    justify-content: center;
 }
 
-#viz3 .story, #viz3 .viz {
+#viz3 .story,
+#viz3 .viz {
     padding-top: 100px;
 }
+
 #viz3 .viz {
     height: 50vh;
 }
+
 #viz3 .label {
     position: absolute;
     top: 10%;
@@ -98,9 +102,11 @@ main {
     color: #d73027;
     width: 300px
 }
+
 #viz3 .label strong {
     font-size: 20px;
 }
+
 #viz3 .label:nth-of-type(2) {
     top: 75%;
     color: #1a9850;
