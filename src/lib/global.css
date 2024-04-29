@@ -64,13 +64,41 @@ main {
     /* color: #fff; */
 }
 
-.intro h3 b {
+.intro h3 b,
+.content h3 b {
     background-color: #fff6c7;
     padding: 3px 5px;
 }
 
-.intro h3 b:nth-of-type(2) {
+.intro h3 b:nth-of-type(2),
+.content h3 b:nth-of-type(2) {
     background-color: #ffee91;
+}
+.content {
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+}
+
+#viz3 .story, #viz3 .viz {
+    padding-top: 100px;
+}
+#viz3 .viz {
+    height: 50vh;
+}
+#viz3 .label {
+    position: absolute;
+    top: 100px;
+    right: -330px;
+    color: #d73027;
+    width: 300px
+}
+#viz3 .label strong {
+    font-size: 20px;
+}
+#viz3 .label:nth-of-type(2) {
+    top: 500px;
+    color: #1a9850;
 }
 
 .sep {
@@ -166,7 +194,6 @@ header label {
 }
 
 header year {
-    display: block;
     display: flex;
     justify-content: flex-end;
 }

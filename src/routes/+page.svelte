@@ -2,6 +2,7 @@
     import "../../node_modules/mapbox-gl/dist/mapbox-gl.css";
     import { onMount } from "svelte";
     import VisOne from "./VisOne.svelte";
+    import VisThree from "./VisThree.svelte";
     import LoremIpsum from "./LoremIpsum.svelte";
 
     let opacity = 1;
@@ -67,19 +68,21 @@
     <VisOne />
 
     <!-- <LoremIpsum /> -->
-    <div class="intro">
+    <div class="content">
         <h3>
             <b>Evidently, developers overwhelmingly target wealthy buyers.</b>
             Much fewer affordable units were built in the same timeframe. However,
             some argue that any new housing is good housing. The argument is that
             by increasing the housing supply (even with only luxury housing), savings
-            would eventually trickle down to all homebuyers.
+            would eventually trickle down to all homebuyers.<br /><br />
             <b
                 >But, is this true? How have luxury developments in Boston
                 affected house prices in their surrounding neighborhoods?</b
             >
         </h3>
     </div>
+
+    <VisThree />
 </div>
 
 <style>
