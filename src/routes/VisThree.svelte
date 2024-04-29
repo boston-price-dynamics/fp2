@@ -8,9 +8,7 @@
 
     function printDifference(data, column) {
         const currentYear =
-            progress >= 90
-                ? 2022
-                : 2000 + parseInt(((progress + 10) / 100) * 22);
+            progress >= 90 ? 2022 : 2000 + parseInt((progress / 100) * 22);
         const found = data.find((d) => parseInt(d.year) === currentYear);
         const baseline = data.find((d) => parseInt(d.year) === 2000);
         if (found && baseline) {
@@ -33,7 +31,7 @@
                 0,
                 d3.max(data, function (d) {
                     const val = parseFloat(
-                        d["Mass. condos median sales price"],
+                        d["Mass. condos median sales price"]
                     );
                     return val;
                 }),
@@ -42,13 +40,13 @@
         var line = d3
             .line()
             .x(function (d, index, arr) {
-                if (((progress + 10) / 100) * 22 < index) {
+                if ((progress / 100) * 22 < index) {
                     return undefined;
                 }
                 return margin.left + x(d.year);
             })
             .y(function (d, index, arr) {
-                if (((progress + 10) / 100) * 22 < index) {
+                if ((progress / 100) * 22 < index) {
                     return undefined;
                 }
                 return y(d[column]);
@@ -101,7 +99,7 @@
 </script>
 
 <div id="viz3">
-    <Scrolly bind:progress --scrolly-layout="viz-first" threshold="0">
+    <Scrolly bind:progress --scrolly-layout="viz-first" threshold="1">
         <svelte:fragment slot="viz">
             <!-- <div id="my_dataviz"></div> -->
             <svg id="svg" width="800" height="500"
@@ -366,11 +364,11 @@
                 Percent change in median house sales price in Mass. from 2000 to {progress >=
                 90
                     ? 2022
-                    : 2000 + parseInt(((progress + 10) / 100) * 22)}<br />
+                    : 2000 + parseInt((progress / 100) * 22)}<br />
                 <strong
                     >{printDifference(
                         data,
-                        "Mass. condos median sales price",
+                        "Mass. condos median sales price"
                     )}%</strong
                 >
             </div>
@@ -378,11 +376,11 @@
                 Percent change in median household income in Mass. from 2000 to {progress >=
                 90
                     ? 2022
-                    : 2000 + parseInt(((progress + 10) / 100) * 22)}<br />
+                    : 2000 + parseInt((progress / 100) * 22)}<br />
                 <strong
                     >{printDifference(
                         data,
-                        "Mass. median household income",
+                        "Mass. median household income"
                     )}%</strong
                 >
             </div>
