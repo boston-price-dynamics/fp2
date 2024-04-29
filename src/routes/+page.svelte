@@ -63,21 +63,23 @@
             >
         </h3>
     </div>
-    <div class="sep"></div>
+
     <VisOne />
 
     <!-- <LoremIpsum /> -->
-    <h3>
-        <b>Evidently, developers overwhelmingly target wealthy buyers.</b> Much
-        fewer affordable units were built in the same timeframe. However, some
-        argue that any new housing is good housing. The argument is that by
-        increasing the housing supply (even with only luxury housing), savings
-        would eventually trickle down to all homebuyers.
-        <b
-            >But, is this true? How have luxury developments in Boston affected
-            house prices in their surrounding neighborhoods?</b
-        >
-    </h3>
+    <div class="intro">
+        <h3>
+            <b>Evidently, developers overwhelmingly target wealthy buyers.</b>
+            Much fewer affordable units were built in the same timeframe. However,
+            some argue that any new housing is good housing. The argument is that
+            by increasing the housing supply (even with only luxury housing), savings
+            would eventually trickle down to all homebuyers.
+            <b
+                >But, is this true? How have luxury developments in Boston
+                affected house prices in their surrounding neighborhoods?</b
+            >
+        </h3>
+    </div>
 </div>
 
 <style>

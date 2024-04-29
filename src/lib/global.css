@@ -64,6 +64,15 @@ main {
     /* color: #fff; */
 }
 
+.intro h3 b {
+    background-color: #fff6c7;
+    padding: 3px 5px;
+}
+
+.intro h3 b:nth-of-type(2) {
+    background-color: #ffee91;
+}
+
 .sep {
     margin-bottom: 30px;
 }
@@ -88,6 +97,10 @@ main {
     background-color: #2c2f39;
     padding: 1rem 2rem;
     color: #fff;
+}
+
+.info .stat p {
+    color: #ffee91;
 }
 /* header {
     display: flex;
