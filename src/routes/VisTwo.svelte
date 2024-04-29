@@ -189,7 +189,7 @@
             <div class="info">
                 <h1 class="date-heading">{item.date}</h1>
                 <h2 class="event-heading">{item.event}</h2>
-                <h3>{item.description}</h3>
+                <p>{item.description}</p>
                 {#if item.image !== ""}
                     <img src={item.image} alt="img" />
                 {/if}
@@ -258,5 +258,21 @@
 
     #map circle {
         pointer-events: auto;
+    }
+
+    .info p {
+        text-align: end;
+    }
+
+    .info {
+        display: flex;
+        flex-direction: column;
+        align-items: end;
+        padding-bottom: 2rem;
+        gap: 1rem;
+    }
+
+    .info h2 {
+        margin: 0;
     }
 </style>
