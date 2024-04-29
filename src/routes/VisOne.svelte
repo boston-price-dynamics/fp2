@@ -14,6 +14,7 @@
     let properties = [];
     let incomes = [];
     let incomesToCdf = {};
+    let houseprices = [];
     let radiusScale;
     onMount(async () => {
         map = new mapboxgl.Map({
@@ -53,6 +54,11 @@
         for (let it of incomes) {
             incomesToCdf[it.income] = it.cdf;
         }
+
+        houseprices = await d3.csv(
+            "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/house_dist.csv",
+            d3.autoType,
+        );
     });
 
     function getCoords(property) {
@@ -233,6 +239,23 @@
     $: maxX = incomes[incomes.length - 1]?.income;
     $: path = `M${incomes.map((p) => `${xScale(p.income)},${yScale(p.pdf)}`).join("L")}`;
     $: area = `${path}L${xScale(maxX)},${yScale(0)}L${xScale(minX)},${yScale(0)}Z`;
+
+    /////////
+    let xTicks2 = [0, 1000000, 2000000, 3000000, 4000000, 5000000];
+    $: xScale2 = d3
+        .scaleLinear()
+        .domain([minX2, maxX2])
+        .range([padding.left, width - padding.right]);
+
+    $: yScale2 = d3
+        .scaleLinear()
+        .domain(d3.extent(houseprices, (d) => d.pdf))
+        .range([height - padding.bottom, padding.top]);
+
+    $: minX2 = houseprices[0]?.house_price;
+    $: maxX2 = houseprices[houseprices.length - 1]?.house_price;
+    $: path2 = `M${houseprices.map((p) => `${xScale2(p.house_price)},${yScale2(p.pdf)}`).join("L")}`;
+    $: area2 = `${path2}L${xScale2(maxX)},${yScale2(0)}L${xScale2(minX)},${yScale2(0)}Z`;
 </script>
 
 <div class="chart">
@@ -264,6 +287,41 @@
 </div>
 <p>
     Your household income is greater than {Math.min(
+        incomesToCdf[Math.round(incomeFilter / 5000) * 5000] * 100,
+        99,
+    )?.toLocaleString(undefined, {
+        maximumFractionDigits: 2,
+    }) ?? 0}% of other Boston households
+</p>
+<div class="chart">
+    <svg>
+        <path class="path-area" d={area2} />
+        <path class="path-line" d={path2} />
+        <g class="axis x-axis">
+            {#each xTicks2 as tick}
+                <g
+                    class="tick tick-{tick}"
+                    transform="translate({xScale2(tick)},{height})"
+                >
+                    <line y1="-{height}" y2="-{padding.bottom}" x1="0" x2="0" />
+                    <text y="-2" font-size="10"
+                        >{width > 380
+                            ? USDollar.format(tick)
+                            : formatMobile(tick)}</text
+                    >
+                </g>
+            {/each}
+            <g
+                class="tick highlight-tick"
+                transform="translate({xScale2(incomeFilter / 0.3)},{height})"
+            >
+                <line y1="-{height}" y2="-{padding.bottom}" x1="0" x2="0" />
+            </g>
+        </g>
+    </svg>
+</div>
+<p>
+    Yet you can only afford {Math.min(
         incomesToCdf[Math.round(incomeFilter / 5000) * 5000] * 100,
         99,
     )?.toLocaleString(undefined, {
