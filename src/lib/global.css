@@ -93,8 +93,8 @@ main {
 }
 #viz3 .label {
     position: absolute;
-    top: 100px;
-    right: -330px;
+    top: 10%;
+    right: -37%;
     color: #d73027;
     width: 300px
 }
@@ -102,7 +102,7 @@ main {
     font-size: 20px;
 }
 #viz3 .label:nth-of-type(2) {
-    top: 500px;
+    top: 75%;
     color: #1a9850;
 }
 
