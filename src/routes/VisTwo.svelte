@@ -104,6 +104,13 @@
         min-height: 70vh;
         min-width: 50%;
     }
+    #viz2 svg {
+        position: absolute;
+        z-index: 10;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
     .descrips {
         min-height: 80vh;
         max-height: 80vh;
