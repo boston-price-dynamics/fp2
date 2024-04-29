@@ -12,6 +12,10 @@
     let mapViewChanged = 0;
 
     let properties = [];
+    let incomes = [];
+    let incomesToCdf = {};
+    let houseprices = [];
+    let housepricesToCdf = {};
     let radiusScale;
     onMount(async () => {
         map = new mapboxgl.Map({
@@ -23,13 +27,13 @@
         await new Promise((resolve) => map.on("load", resolve));
 
         properties = await d3.csv(
-            "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/assess_lat_long.csv"
+            "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/assess_lat_long.csv",
         );
 
         let totalUnits = d3.rollup(
             properties,
             (v) => v.length,
-            (d) => d.GIS_ID
+            (d) => d.GIS_ID,
         );
 
         properties = properties.map((property) => {
@@ -42,6 +46,25 @@
             .scaleSqrt()
             .domain([0, d3.max(properties, (d) => d.totalUnits)])
             .range([0, 50]);
+
+        incomes = await d3.csv(
+            "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/income_dist.csv",
+            d3.autoType,
+        );
+
+        for (let it of incomes) {
+            incomesToCdf[it.income] = it.cdf;
+        }
+
+        houseprices = await d3.csv(
+            "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/house_dist.csv",
+            d3.autoType,
+        );
+
+        for (let ht of houseprices) {
+            housepricesToCdf[ht.house_price] = ht.cdf;
+        }
+        console.log(housepricesToCdf);
     });
 
     function getCoords(property) {
@@ -77,7 +100,7 @@
         const range = filteredPropertiesByYear.filter(
             (p) =>
                 p.TOTAL_VALUE <= parseInt(value) + 100_000 &&
-                p.TOTAL_VALUE >= parseInt(value) - 100_000
+                p.TOTAL_VALUE >= parseInt(value) - 100_000,
         );
         const multiplier = index % 2 === 0 ? 1 : -1;
         const result = max / 2 + multiplier * Math.random() * range.length;
@@ -85,7 +108,7 @@
     }
 
     function handleColor(value, incomeFilter) {
-        if (incomeFilter === 1000000 || value * 0.32 < incomeFilter) {
+        if (value * 0.3 < incomeFilter) {
             return "#1a9850";
         }
         return "#d73027";
@@ -121,12 +144,12 @@
         let totalUnitsYear = d3.rollup(
             filteredPropertiesYear,
             (v) => v.length,
-            (d) => d.GIS_ID
+            (d) => d.GIS_ID,
         );
         let totalValueYear = d3.rollup(
             filteredPropertiesYear,
             (v) => d3.sum(v, (d) => d.TOTAL_VALUE),
-            (d) => d.GIS_ID
+            (d) => d.GIS_ID,
         );
         filteredPropertiesYear = filteredPropertiesYear.map((property) => {
             let id = property.GIS_ID;
@@ -137,15 +160,13 @@
 
         filteredPropertiesYearIncome = filteredPropertiesYear.filter(
             (property) => {
-                return incomeFilter === 1000000
-                    ? true
-                    : property.TOTAL_VALUE * 0.32 < incomeFilter;
-            }
+                return property.TOTAL_VALUE * 0.3 < incomeFilter;
+            },
         );
         let totalUnitsYearIncome = d3.rollup(
             filteredPropertiesYearIncome,
             (v) => v.length,
-            (d) => d.GIS_ID
+            (d) => d.GIS_ID,
         );
         let unique = {};
         filteredPropertiesYear = filteredPropertiesYear
@@ -180,16 +201,14 @@
                 });
                 let _filteredPropertiesYearIncome =
                     _filteredPropertiesYear.filter((property) => {
-                        return incomeFilter === 1000000
-                            ? true
-                            : property.TOTAL_VALUE * 0.32 < incomeFilter;
+                        return property.TOTAL_VALUE * 0.3 < incomeFilter;
                     });
                 statsByYear[year] = {
                     number_built: _filteredPropertiesYear.length,
                     number_affordable: _filteredPropertiesYearIncome.length,
                     median_value: d3.median(
                         _filteredPropertiesYear,
-                        (d) => d.TOTAL_VALUE
+                        (d) => d.TOTAL_VALUE,
                     ),
                 };
             }
@@ -200,6 +219,45 @@
         currency: "USD",
         maximumFractionDigits: 0,
     });
+
+    /////////////////
+
+    let width = 500;
+    let height = 200;
+    let padding = { top: 20, right: 15, bottom: 20, left: 25 };
+    let xTicks = [0, 200000, 400000, 600000, 800000, 1000000];
+
+    $: xScale = d3
+        .scaleLinear()
+        .domain([minX, maxX])
+        .range([padding.left, width - padding.right]);
+
+    $: yScale = d3
+        .scaleLinear()
+        .domain(d3.extent(incomes, (d) => d.pdf))
+        .range([height - padding.bottom, padding.top]);
+
+    $: minX = incomes[0]?.income;
+    $: maxX = incomes[incomes.length - 1]?.income;
+    $: path = `M${incomes.map((p) => `${xScale(p.income)},${yScale(p.pdf)}`).join("L")}`;
+    $: area = `${path}L${xScale(maxX)},${yScale(0)}L${xScale(minX)},${yScale(0)}Z`;
+
+    /////////
+    let xTicks2 = [0, 1000000, 2000000, 3000000, 4000000, 5000000];
+    $: xScale2 = d3
+        .scaleLinear()
+        .domain([minX2, maxX2])
+        .range([padding.left, width - padding.right]);
+
+    $: yScale2 = d3
+        .scaleLinear()
+        .domain(d3.extent(houseprices, (d) => d.pdf))
+        .range([height - padding.bottom, padding.top]);
+
+    $: minX2 = houseprices[0]?.house_price;
+    $: maxX2 = houseprices[houseprices.length - 1]?.house_price;
+    $: path2 = `M${houseprices.map((p) => `${xScale2(p.house_price)},${yScale2(p.pdf)}`).join("L")}`;
+    $: area2 = `${path2}L${xScale2(maxX)},${yScale2(0)}L${xScale2(minX)},${yScale2(0)}Z`;
 </script>
 
 <Scrolly
@@ -214,29 +272,21 @@
                 <p>One Dot per Development</p>
             </div>
             <label>
-                Enter your annual income:
+                Enter your annual household income:
                 <input
                     type="range"
                     min="0"
                     max="1000000"
                     bind:value={incomeFilter}
                 />
-                {#if incomeFilter === 1000000}
-                    <year>$1,000,000+</year>
-                {:else}
-                    <year>{USDollar.format(incomeFilter)}</year>
-                {/if}
+                <year>{USDollar.format(incomeFilter)}</year>
             </label>
         </header>
         <div class="summary">
             <h3>
-                With your income of <span class="value"
-                    >{#if incomeFilter === 1000000}
-                        <year>$1,000,000+</year>
-                    {:else}
-                        <year>{USDollar.format(incomeFilter)}</year>
-                    {/if}</span
-                >
+                With your income of <span class="value">
+                    <year>{USDollar.format(incomeFilter)}</year>
+                </span>
                 you can afford
                 <span class="value"
                     >{(
@@ -259,7 +309,7 @@
                             r={radiusScale(property.totalUnitsYear)}
                             fill={colorScale(
                                 property.totalUnitsYearIncome /
-                                    property.totalUnitsYear
+                                    property.totalUnitsYear,
                             )}
                             fill-opacity="0.7"
                             stroke="white"
@@ -319,7 +369,7 @@
                                     >Average new unit price:
                                     {USDollar.format(
                                         property.totalValueYear /
-                                            property.totalUnitsYear
+                                            property.totalUnitsYear,
                                     )}
                                 </tspan>
                             </text>
@@ -485,7 +535,7 @@
                                 opacity="0.5"
                                 fill={handleColor(
                                     property.TOTAL_VALUE,
-                                    incomeFilter
+                                    incomeFilter,
                                 )}
                             ></circle>
                         {/each}
@@ -530,6 +580,110 @@
         {/each}
     </div>
 </Scrolly>
+<div class="comb_prob">
+    <div class="prob_section">
+        <div class="chart">
+            <svg>
+                <path class="path-area" d={area} />
+                <path class="path-line" d={path} />
+                <g class="axis x-axis">
+                    {#each xTicks as tick}
+                        <g
+                            class="tick tick-{tick}"
+                            transform="translate({xScale(tick)},{height})"
+                        >
+                            <line
+                                y1="-{height}"
+                                y2="-{padding.bottom}"
+                                x1="0"
+                                x2="0"
+                            />
+                            <text y="-2" font-size="10"
+                                >{width > 380
+                                    ? USDollar.format(tick)
+                                    : formatMobile(tick)}</text
+                            >
+                        </g>
+                    {/each}
+                    <g
+                        class="tick highlight-tick"
+                        transform="translate({xScale(incomeFilter)},{height})"
+                    >
+                        <line
+                            y1="-{height}"
+                            y2="-{padding.bottom}"
+                            x1="0"
+                            x2="0"
+                        />
+                    </g>
+                </g>
+            </svg>
+        </div>
+        <h3>
+            Your household income is greater than <b
+                >{Math.min(
+                    incomesToCdf[Math.round(incomeFilter / 5000) * 5000] * 100,
+                    99,
+                )?.toLocaleString(undefined, {
+                    maximumFractionDigits: 2,
+                }) ?? 0}%</b
+            > of other Boston households...
+        </h3>
+    </div>
+    <div class="prob_section">
+        <div class="chart">
+            <svg>
+                <path class="path-area" d={area2} />
+                <path class="path-line" d={path2} />
+                <g class="axis x-axis">
+                    {#each xTicks2 as tick}
+                        <g
+                            class="tick tick-{tick}"
+                            transform="translate({xScale2(tick)},{height})"
+                        >
+                            <line
+                                y1="-{height}"
+                                y2="-{padding.bottom}"
+                                x1="0"
+                                x2="0"
+                            />
+                            <text y="-2" font-size="10"
+                                >{width > 380
+                                    ? USDollar.format(tick)
+                                    : formatMobile(tick)}</text
+                            >
+                        </g>
+                    {/each}
+                    <g
+                        class="tick highlight-tick"
+                        transform="translate({xScale2(
+                            incomeFilter / 0.3,
+                        )},{height})"
+                    >
+                        <line
+                            y1="-{height}"
+                            y2="-{padding.bottom}"
+                            x1="0"
+                            x2="0"
+                        />
+                    </g>
+                </g>
+            </svg>
+        </div>
+        <h3>
+            ...yet you can only afford <b
+                >{Math.min(
+                    housepricesToCdf[
+                        Math.round(incomeFilter / 0.3 / 10000) * 10000
+                    ] * 100,
+                    99,
+                )?.toLocaleString(undefined, {
+                    maximumFractionDigits: 2,
+                }) ?? 0}%</b
+            > of new housing units developed between 2000 and 2022.
+        </h3>
+    </div>
+</div>
 
 <style>
     @import url("$lib/global.css");
@@ -561,5 +715,75 @@
             background-color: var(--color);
             font-size: 9px;
         }
+    }
+
+    .chart {
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .chart svg {
+        position: relative;
+        width: 100%;
+        height: 200px;
+        overflow: visible;
+    }
+    .tick {
+        font-size: 0.725em;
+        font-weight: 200;
+    }
+
+    /* .tick line {
+        stroke: #888;
+        stroke-dasharray: 2;
+    } */
+
+    .tick text {
+        fill: #888;
+        text-anchor: start;
+    }
+
+    .tick.tick-0 line {
+        stroke: #888;
+        stroke-dasharray: 0;
+    }
+
+    .tick.highlight-tick line {
+        stroke: #ffee91;
+        stroke-dasharray: 0;
+        stroke-width: 3;
+    }
+
+    .x-axis .tick text {
+        text-anchor: middle;
+    }
+    .path-line {
+        fill: none;
+        stroke: rgb(55, 183, 225);
+        stroke-linejoin: round;
+        stroke-linecap: round;
+        stroke-width: 2;
+    }
+    .path-area {
+        fill: rgb(55, 183, 225, 0.2);
+    }
+    .prob_section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .comb_prob {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3em;
+        background-color: #2c2f39;
+        color: white;
+        padding: 4rem 1rem;
+        margin: 2rem 5rem;
+    }
+    h3 b {
+        font-size: 40px;
+        padding: 0 6px;
     }
 </style>
