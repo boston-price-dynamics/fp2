@@ -26,12 +26,135 @@
     onMount(async () => {
         map = new mapboxgl.Map({
             container: "viz2",
-            style: "mapbox://styles/mapbox/standard",
-            center: [-71.08401, 42.34577],
+            style: "mapbox://styles/jyoonsong/cluq04ktu05cr01qqb4rp4v4f",
+            center: [-71.08059, 42.3453683],
             zoom: 16,
             pitch: 60,
         });
+
+        map.on("style.load", () => {
+            // Insert the layer beneath any symbol layer.
+            const layers = map.getStyle().layers;
+            const labelLayerId = layers.find(
+                (layer) =>
+                    layer.type === "symbol" && layer.layout["text-field"],
+            ).id;
+
+            // The 'building' layer in the Mapbox Streets
+            // vector tileset contains building height data
+            // from OpenStreetMap.
+            map.addLayer(
+                {
+                    id: "add-3d-buildings",
+                    source: "composite",
+                    "source-layer": "building",
+                    filter: ["==", "extrude", "true"],
+                    type: "fill-extrusion",
+                    minzoom: 15,
+                    paint: {
+                        "fill-extrusion-color": [
+                            "case",
+                            ["boolean", ["feature-state", "hover"], false],
+                            "#000",
+                            "#ddd",
+                        ],
+
+                        // Use an 'interpolate' expression to
+                        // add a smooth transition effect to
+                        // the buildings as the user zooms in.
+                        "fill-extrusion-height": [
+                            "interpolate",
+                            ["linear"],
+                            ["zoom"],
+                            15,
+                            0,
+                            15.05,
+                            ["get", "height"],
+                        ],
+                        "fill-extrusion-base": [
+                            "interpolate",
+                            ["linear"],
+                            ["zoom"],
+                            15,
+                            0,
+                            15.05,
+                            ["get", "min_height"],
+                        ],
+                        "fill-extrusion-opacity": 0.8,
+                    },
+                },
+                labelLayerId,
+            );
+        });
         await new Promise((resolve) => map.on("load", resolve));
+
+        map.setFeatureState(
+            {
+                source: "composite",
+                sourceLayer: "building",
+                id: 818117637,
+            },
+            {
+                hover: true,
+            },
+        );
+
+        // let fHover;
+
+        // map.on("click", function (e) {
+        //     var features = map.queryRenderedFeatures(e.point, {
+        //         layers: ["add-3d-buildings"],
+        //     });
+        //     console.log(features[0].id);
+        // });
+
+        // map.on("mousemove", function (e) {
+        //     var features = map.queryRenderedFeatures(e.point, {
+        //         layers: ["add-3d-buildings"],
+        //     });
+        //     //we will change pointer and color for 42455719
+        //     if (features[0] && features[0].id == 818117637) {
+        //         mouseover(features[0]);
+        //     } else {
+        //         mouseout();
+        //     }
+        // });
+
+        // map.on("mouseout", function (e) {
+        //     mouseout();
+        // });
+
+        // function mouseout() {
+        //     if (!fHover) return;
+        //     map.getCanvasContainer().style.cursor = "default";
+        //     map.setFeatureState(
+        //         {
+        //             source: fHover.source,
+        //             sourceLayer: fHover.sourceLayer,
+        //             id: fHover.id,
+        //         },
+        //         {
+        //             hover: false,
+        //         },
+        //     );
+        // }
+
+        // function mouseover(feature) {
+        //     fHover = feature;
+        //     console.log(fHover.id);
+        //     map.getCanvasContainer().style.cursor = "pointer";
+
+        //     map.setFeatureState(
+        //         {
+        //             source: fHover.source,
+        //             sourceLayer: fHover.sourceLayer,
+        //             id: fHover.id,
+        //         },
+        //         {
+        //             hover: true,
+        //         },
+        //     );
+        // }
 
         timelineData = await d3.json("One Dalton.json");
         timelineData.forEach((row) => {
@@ -57,7 +180,7 @@
     let colorScale = d3
         .scaleLinear()
         .domain([0, 3000000])
-        .range(["white", "black"]); // Adjust the range of colors as needed
+        .range(["white", "#d73027"]); // Adjust the range of colors as needed
 </script>
 
 <Scrolly bind:progress={timelineProgress}>
@@ -87,8 +210,12 @@
                             {...getCoords(building)}
                             r="7"
                             fill={colorScale(
-                                parseInt(building.TOTAL_VALUE.replace(/,/g, ""))
+                                parseInt(
+                                    building.TOTAL_VALUE.replace(/,/g, ""),
+                                ),
                             )}
+                            fill-opacity="0.7"
+                            stroke="white"
                         />
                     {/key}
                 {/each}
