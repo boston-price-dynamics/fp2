@@ -119,7 +119,9 @@
 
     .date-heading {
         font-weight: bold;
-        font-size: 30px; /* You can adjust the font size as needed */
+        font-size: 70px; /* You can adjust the font size as needed */
+        margin-top: 30px;
+        margin-bottom: 0;
     }
 
     img {
