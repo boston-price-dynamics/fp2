@@ -13,11 +13,10 @@
                 : 2000 + parseInt(((progress + 10) / 100) * 22);
         const found = data.find((d) => parseInt(d.year) === currentYear);
         const baseline = data.find((d) => parseInt(d.year) === 2000);
-        if (found) {
-            return (
-                ((found[column] - baseline[column]) / baseline[column]) *
-                100
-            ).toFixed(2);
+        if (found && baseline) {
+            const diff =
+                ((found[column] - baseline[column]) / baseline[column]) * 100;
+            return diff >= 0 ? "+" + diff.toFixed(2) : diff.toFixed(2);
         }
         return 0;
     }
