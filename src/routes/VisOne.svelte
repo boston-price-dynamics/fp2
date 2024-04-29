@@ -108,7 +108,7 @@
     }
 
     function handleColor(value, incomeFilter) {
-        if (incomeFilter === 1000000 || value * 0.3 < incomeFilter) {
+        if (value * 0.3 < incomeFilter) {
             return "#1a9850";
         }
         return "#d73027";
@@ -160,9 +160,7 @@
 
         filteredPropertiesYearIncome = filteredPropertiesYear.filter(
             (property) => {
-                return incomeFilter === 1000000
-                    ? true
-                    : property.TOTAL_VALUE * 0.3 < incomeFilter;
+                return property.TOTAL_VALUE * 0.3 < incomeFilter;
             },
         );
         let totalUnitsYearIncome = d3.rollup(
@@ -203,9 +201,7 @@
                 });
                 let _filteredPropertiesYearIncome =
                     _filteredPropertiesYear.filter((property) => {
-                        return incomeFilter === 1000000
-                            ? true
-                            : property.TOTAL_VALUE * 0.3 < incomeFilter;
+                        return property.TOTAL_VALUE * 0.3 < incomeFilter;
                     });
                 statsByYear[year] = {
                     number_built: _filteredPropertiesYear.length,
@@ -264,77 +260,6 @@
     $: area2 = `${path2}L${xScale2(maxX)},${yScale2(0)}L${xScale2(minX)},${yScale2(0)}Z`;
 </script>
 
-<div class="chart">
-    <svg>
-        <path class="path-area" d={area} />
-        <path class="path-line" d={path} />
-        <g class="axis x-axis">
-            {#each xTicks as tick}
-                <g
-                    class="tick tick-{tick}"
-                    transform="translate({xScale(tick)},{height})"
-                >
-                    <line y1="-{height}" y2="-{padding.bottom}" x1="0" x2="0" />
-                    <text y="-2" font-size="10"
-                        >{width > 380
-                            ? USDollar.format(tick)
-                            : formatMobile(tick)}</text
-                    >
-                </g>
-            {/each}
-            <g
-                class="tick highlight-tick"
-                transform="translate({xScale(incomeFilter)},{height})"
-            >
-                <line y1="-{height}" y2="-{padding.bottom}" x1="0" x2="0" />
-            </g>
-        </g>
-    </svg>
-</div>
-<p>
-    Your household income is greater than {Math.min(
-        incomesToCdf[Math.round(incomeFilter / 5000) * 5000] * 100,
-        99,
-    )?.toLocaleString(undefined, {
-        maximumFractionDigits: 2,
-    }) ?? 0}% of other Boston households
-</p>
-<div class="chart">
-    <svg>
-        <path class="path-area" d={area2} />
-        <path class="path-line" d={path2} />
-        <g class="axis x-axis">
-            {#each xTicks2 as tick}
-                <g
-                    class="tick tick-{tick}"
-                    transform="translate({xScale2(tick)},{height})"
-                >
-                    <line y1="-{height}" y2="-{padding.bottom}" x1="0" x2="0" />
-                    <text y="-2" font-size="10"
-                        >{width > 380
-                            ? USDollar.format(tick)
-                            : formatMobile(tick)}</text
-                    >
-                </g>
-            {/each}
-            <g
-                class="tick highlight-tick"
-                transform="translate({xScale2(incomeFilter / 0.3)},{height})"
-            >
-                <line y1="-{height}" y2="-{padding.bottom}" x1="0" x2="0" />
-            </g>
-        </g>
-    </svg>
-</div>
-<p>
-    Yet you can only afford {Math.min(
-        housepricesToCdf[Math.round(incomeFilter / 0.3 / 10000) * 10000] * 100,
-        99,
-    )?.toLocaleString(undefined, {
-        maximumFractionDigits: 2,
-    }) ?? 0}% of other Boston households
-    {Math.round(incomeFilter / 0.3 / 10000) * 10000}
-</p>
 <Scrolly
     bind:progress={yearProgress}
     --scrolly-layout="viz-first"
@@ -354,22 +279,14 @@
                     max="1000000"
                     bind:value={incomeFilter}
                 />
-                {#if incomeFilter === 1000000}
-                    <year>$1,000,000+</year>
-                {:else}
-                    <year>{USDollar.format(incomeFilter)}</year>
-                {/if}
+                <year>{USDollar.format(incomeFilter)}</year>
             </label>
         </header>
         <div class="summary">
             <h3>
-                With your income of <span class="value"
-                    >{#if incomeFilter === 1000000}
-                        <year>$1,000,000+</year>
-                    {:else}
-                        <year>{USDollar.format(incomeFilter)}</year>
-                    {/if}</span
-                >
+                With your income of <span class="value">
+                    <year>{USDollar.format(incomeFilter)}</year>
+                </span>
                 you can afford
                 <span class="value"
                     >{(
@@ -663,6 +580,110 @@
         {/each}
     </div>
 </Scrolly>
+<div class="comb_prob">
+    <div class="prob_section">
+        <div class="chart">
+            <svg>
+                <path class="path-area" d={area} />
+                <path class="path-line" d={path} />
+                <g class="axis x-axis">
+                    {#each xTicks as tick}
+                        <g
+                            class="tick tick-{tick}"
+                            transform="translate({xScale(tick)},{height})"
+                        >
+                            <line
+                                y1="-{height}"
+                                y2="-{padding.bottom}"
+                                x1="0"
+                                x2="0"
+                            />
+                            <text y="-2" font-size="10"
+                                >{width > 380
+                                    ? USDollar.format(tick)
+                                    : formatMobile(tick)}</text
+                            >
+                        </g>
+                    {/each}
+                    <g
+                        class="tick highlight-tick"
+                        transform="translate({xScale(incomeFilter)},{height})"
+                    >
+                        <line
+                            y1="-{height}"
+                            y2="-{padding.bottom}"
+                            x1="0"
+                            x2="0"
+                        />
+                    </g>
+                </g>
+            </svg>
+        </div>
+        <h3>
+            Your household income is greater than <b
+                >{Math.min(
+                    incomesToCdf[Math.round(incomeFilter / 5000) * 5000] * 100,
+                    99,
+                )?.toLocaleString(undefined, {
+                    maximumFractionDigits: 2,
+                }) ?? 0}%</b
+            > of other Boston households...
+        </h3>
+    </div>
+    <div class="prob_section">
+        <div class="chart">
+            <svg>
+                <path class="path-area" d={area2} />
+                <path class="path-line" d={path2} />
+                <g class="axis x-axis">
+                    {#each xTicks2 as tick}
+                        <g
+                            class="tick tick-{tick}"
+                            transform="translate({xScale2(tick)},{height})"
+                        >
+                            <line
+                                y1="-{height}"
+                                y2="-{padding.bottom}"
+                                x1="0"
+                                x2="0"
+                            />
+                            <text y="-2" font-size="10"
+                                >{width > 380
+                                    ? USDollar.format(tick)
+                                    : formatMobile(tick)}</text
+                            >
+                        </g>
+                    {/each}
+                    <g
+                        class="tick highlight-tick"
+                        transform="translate({xScale2(
+                            incomeFilter / 0.3,
+                        )},{height})"
+                    >
+                        <line
+                            y1="-{height}"
+                            y2="-{padding.bottom}"
+                            x1="0"
+                            x2="0"
+                        />
+                    </g>
+                </g>
+            </svg>
+        </div>
+        <h3>
+            ...yet you can only afford <b
+                >{Math.min(
+                    housepricesToCdf[
+                        Math.round(incomeFilter / 0.3 / 10000) * 10000
+                    ] * 100,
+                    99,
+                )?.toLocaleString(undefined, {
+                    maximumFractionDigits: 2,
+                }) ?? 0}%</b
+            > of new housing units developed between 2000 and 2022.
+        </h3>
+    </div>
+</div>
 
 <style>
     @import url("$lib/global.css");
@@ -728,7 +749,7 @@
     }
 
     .tick.highlight-tick line {
-        stroke: red;
+        stroke: #ffee91;
         stroke-dasharray: 0;
         stroke-width: 3;
     }
@@ -738,12 +759,31 @@
     }
     .path-line {
         fill: none;
-        stroke: rgb(0, 100, 100);
+        stroke: rgb(55, 183, 225);
         stroke-linejoin: round;
         stroke-linecap: round;
         stroke-width: 2;
     }
     .path-area {
-        fill: rgba(0, 100, 100, 0.2);
+        fill: rgb(55, 183, 225, 0.2);
+    }
+    .prob_section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .comb_prob {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3em;
+        background-color: #2c2f39;
+        color: white;
+        padding: 4rem 1rem;
+        margin: 2rem 5rem;
+    }
+    h3 b {
+        font-size: 40px;
+        padding: 0 6px;
     }
 </style>

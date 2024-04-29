@@ -22,6 +22,7 @@ main {
     align-items: center;
     justify-content: center;
 }
+
 .bg {
     position: absolute;
     top: 0;
@@ -31,6 +32,7 @@ main {
     z-index: -1;
     width: 100%;
 }
+
 .title {
     width: 100%;
     height: 100%;
@@ -41,14 +43,17 @@ main {
     text-align: center;
     color: #fff;
 }
+
 .title p {
     padding: 0 27rem;
 }
+
 .title .yellow {
     color: #fff6c7;
 }
+
 .title .darkyellow {
-    color:#ffee91;
+    color: #ffee91;
 }
 
 .intro {
@@ -103,17 +108,21 @@ main {
     color: #ffee91;
     margin-bottom: 0;
 }
+
 .info .stat h2 {
     margin-top: 0;
 }
+
 .summary {
     text-align: center;
 }
+
 .summary .value {
     background-color: #ddd;
     border-radius: 5px;
     padding: 3px 7px;
 }
+
 /* header {
     display: flex;
     gap: 1em;
