@@ -51,7 +51,7 @@
                 if (((progress + 10) / 100) * 22 < index) {
                     return undefined;
                 }
-                return margin.bottom + y(d[column]);
+                return y(d[column]);
             });
         return line(data);
     }
