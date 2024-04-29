@@ -15,6 +15,7 @@
     let incomes = [];
     let incomesToCdf = {};
     let houseprices = [];
+    let housepricesToCdf = {};
     let radiusScale;
     onMount(async () => {
         map = new mapboxgl.Map({
@@ -59,6 +60,11 @@
             "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/house_dist.csv",
             d3.autoType,
         );
+
+        for (let ht of houseprices) {
+            housepricesToCdf[ht.house_price] = ht.cdf;
+        }
+        console.log(housepricesToCdf);
     });
 
     function getCoords(property) {
@@ -322,11 +328,12 @@
 </div>
 <p>
     Yet you can only afford {Math.min(
-        incomesToCdf[Math.round(incomeFilter / 5000) * 5000] * 100,
+        housepricesToCdf[Math.round(incomeFilter / 0.3 / 10000) * 10000] * 100,
         99,
     )?.toLocaleString(undefined, {
         maximumFractionDigits: 2,
     }) ?? 0}% of other Boston households
+    {Math.round(incomeFilter / 0.3 / 10000) * 10000}
 </p>
 <Scrolly
     bind:progress={yearProgress}
