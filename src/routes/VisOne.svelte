@@ -12,6 +12,7 @@
     let mapViewChanged = 0;
 
     let properties = [];
+    let incomes = [];
     let radiusScale;
     onMount(async () => {
         map = new mapboxgl.Map({
@@ -43,7 +44,10 @@
             .domain([0, d3.max(properties, (d) => d.totalUnits)])
             .range([0, 50]);
 
-        incomes = await d3.csv("../income_dist.csv");
+        incomes = await d3.csv(
+            "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/income_dist.csv",
+            d3.autoType,
+        );
         console.log(incomes);
     });
 
@@ -203,8 +207,36 @@
         currency: "USD",
         maximumFractionDigits: 0,
     });
+
+    /////////////////
+
+    let width = 500;
+    let height = 200;
+    let padding = { top: 20, right: 15, bottom: 20, left: 25 };
+
+    $: xScale = d3
+        .scaleLinear()
+        .domain([minX, maxX])
+        .range([padding.left, width - padding.right]);
+
+    $: yScale = d3
+        .scaleLinear()
+        .domain(d3.extent(incomes, (d) => d.pdf))
+        .range([height - padding.bottom, padding.top]);
+
+    $: minX = incomes[0]?.income;
+    $: maxX = incomes[incomes.length - 1]?.income;
+    $: path = `M${incomes.map((p) => `${xScale(p.income)},${yScale(p.pdf)}`).join("L")}`;
+    $: area = `${path}L${xScale(maxX)},${yScale(0)}L${xScale(minX)},${yScale(0)}Z`;
 </script>
 
+<div class="chart">
+    <svg>
+        <!-- data -->
+        <path class="path-area" d={area} />
+        <path class="path-line" d={path} />
+    </svg>
+</div>
 <Scrolly
     bind:progress={yearProgress}
     --scrolly-layout="viz-first"
@@ -564,5 +596,17 @@
             background-color: var(--color);
             font-size: 9px;
         }
+    }
+
+    .chart {
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .chart svg {
+        position: relative;
+        width: 100%;
+        height: 200px;
+        overflow: visible;
     }
 </style>
