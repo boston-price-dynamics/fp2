@@ -27,7 +27,7 @@
         map = new mapboxgl.Map({
             container: "viz2",
             style: "mapbox://styles/jyoonsong/cluq04ktu05cr01qqb4rp4v4f",
-            center: [-71.08059, 42.3453683],
+            center: [-71.0841159, 42.3449576],
             zoom: 16,
             pitch: 60,
         });
@@ -183,7 +183,7 @@
         .range(["white", "#d73027"]); // Adjust the range of colors as needed
 </script>
 
-<Scrolly bind:progress={timelineProgress}>
+<Scrolly bind:progress={timelineProgress} --scrolly-viz-width="500px">
     {#each timelineData as item, index}
         <div class="info-wrapper" style="text-align: center;">
             <div class="info">
@@ -227,9 +227,11 @@
 <style>
     @import url("$lib/global.css");
     #viz2 {
-        flex: 1;
+        /* flex: 1; */
         min-height: 70vh;
-        min-width: 50%;
+        /* min-width: 50%; */
+        flex: 1;
+        width: 500px;
     }
     #viz2 svg {
         position: absolute;
