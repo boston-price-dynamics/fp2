@@ -79,7 +79,8 @@
             <b
                 >But, is this true? How have luxury developments in Boston
                 affected house prices in their surrounding neighborhoods?</b
-            >
+            ><br /><br />
+            Let's take a closer look at One Dalton...
         </h3>
     </div>
 
