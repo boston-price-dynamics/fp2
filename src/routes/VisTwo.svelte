@@ -25,7 +25,7 @@
 
     onMount(async () => {
         map = new mapboxgl.Map({
-            container: "map",
+            container: "viz2",
             style: "mapbox://styles/mapbox/standard",
             center: [-71.08401, 42.34577],
             zoom: 16,
@@ -62,36 +62,27 @@
 
 <Scrolly bind:progress={timelineProgress}>
     {#each timelineData as item, index}
-        <div class="descrips" style="text-align: center;">
-            <!-- <h1 class="date-heading">{item.date.toISOString().split('T')[0]}</h1> -->
-            <h1 class="date-heading">{item.date}</h1>
-            <h2>{item.event}</h2>
-            <h3>{item.description}</h3>
-            {#if item.image !== ""}
-                <img src={item.image} alt="img" />
-            {/if}
-            <h5><a href={item.link}>{item.link}</a></h5>
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
+        <div class="info-wrapper" style="text-align: center;">
+            <div class="info">
+                <h1 class="date-heading">{item.date}</h1>
+                <h2 class="event-heading">{item.event}</h2>
+                <h3>{item.description}</h3>
+                {#if item.image !== ""}
+                    <img src={item.image} alt="img" />
+                {/if}
+                {#if item.link !== ""}
+                    <a class="event-link" href={item.link}>Read More</a>
+                {/if}
+            </div>
         </div>
     {/each}
 
     <svelte:fragment slot="viz">
-        <p>{mapMaxtime}</p>
-        <div id="map">
+        <p class="timeline">{mapMaxtime}</p>
+        <div id="viz2">
             <svg>
-                {#key mapViewChanged}
-                    {#each filteredBuildings as building}
+                {#each filteredBuildings as building}
+                    {#key mapViewChanged}
                         <circle
                             {...getCoords(building)}
                             r="7"
@@ -99,8 +90,8 @@
                                 parseInt(building.TOTAL_VALUE.replace(/,/g, ""))
                             )}
                         />
-                    {/each}
-                {/key}
+                    {/key}
+                {/each}
             </svg>
         </div>
     </svelte:fragment>
@@ -108,7 +99,7 @@
 
 <style>
     @import url("$lib/global.css");
-    #map {
+    #viz2 {
         flex: 1;
         min-height: 70vh;
         min-width: 50%;
