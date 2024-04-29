@@ -33,7 +33,7 @@
                 0,
                 d3.max(data, function (d) {
                     const val = parseFloat(
-                        d["Mass. condos median sales price"]
+                        d["Mass. condos median sales price"],
                     );
                     return val;
                 }),
@@ -363,24 +363,26 @@
                 {/key}
             </svg>
             <div class="label">
-                Percent change in House Price <br />from 2000 to {progress >= 90
+                Percent change in median house sales price in Mass. from 2000 to {progress >=
+                90
                     ? 2022
                     : 2000 + parseInt(((progress + 10) / 100) * 22)}<br />
                 <strong
                     >{printDifference(
                         data,
-                        "Mass. condos median sales price"
+                        "Mass. condos median sales price",
                     )}%</strong
                 >
             </div>
             <div class="label">
-                Percent change in Income<br />from 2000 to {progress >= 90
+                Percent change in median household income in Mass. from 2000 to {progress >=
+                90
                     ? 2022
                     : 2000 + parseInt(((progress + 10) / 100) * 22)}<br />
                 <strong
                     >{printDifference(
                         data,
-                        "Mass. median household income"
+                        "Mass. median household income",
                     )}%</strong
                 >
             </div>
