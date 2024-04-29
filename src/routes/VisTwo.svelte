@@ -62,32 +62,23 @@
 
 <Scrolly bind:progress={timelineProgress}>
     {#each timelineData as item, index}
-        <div class="descrips" style="text-align: center;">
-            <!-- <h1 class="date-heading">{item.date.toISOString().split('T')[0]}</h1> -->
-            <h1 class="date-heading">{item.date}</h1>
-            <h2>{item.event}</h2>
-            <h3>{item.description}</h3>
-            {#if item.image !== ""}
-                <img src={item.image} alt="img" />
-            {/if}
-            <h5><a href={item.link}>{item.link}</a></h5>
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
+        <div class="info-wrapper" style="text-align: center;">
+            <div class="info">
+                <h1 class="date-heading">{item.date}</h1>
+                <h2 class="event-heading">{item.event}</h2>
+                <h3>{item.description}</h3>
+                {#if item.image !== ""}
+                    <img src={item.image} alt="img" />
+                {/if}
+                {#if item.link !== ""}
+                    <a class="event-link" href={item.link}>Read More</a>
+                {/if}
+            </div>
         </div>
     {/each}
 
     <svelte:fragment slot="viz">
-        <p>{mapMaxtime}</p>
+        <p class="timeline">{mapMaxtime}</p>
         <div id="map">
             <svg>
                 {#key mapViewChanged}
