@@ -23,13 +23,13 @@
         await new Promise((resolve) => map.on("load", resolve));
 
         properties = await d3.csv(
-            "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/assess_lat_long.csv",
+            "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/assess_lat_long.csv"
         );
 
         let totalUnits = d3.rollup(
             properties,
             (v) => v.length,
-            (d) => d.GIS_ID,
+            (d) => d.GIS_ID
         );
 
         properties = properties.map((property) => {
@@ -77,7 +77,7 @@
         const range = filteredPropertiesByYear.filter(
             (p) =>
                 p.TOTAL_VALUE <= parseInt(value) + 100_000 &&
-                p.TOTAL_VALUE >= parseInt(value) - 100_000,
+                p.TOTAL_VALUE >= parseInt(value) - 100_000
         );
         const multiplier = index % 2 === 0 ? 1 : -1;
         const result = max / 2 + multiplier * Math.random() * range.length;
@@ -121,12 +121,12 @@
         let totalUnitsYear = d3.rollup(
             filteredPropertiesYear,
             (v) => v.length,
-            (d) => d.GIS_ID,
+            (d) => d.GIS_ID
         );
         let totalValueYear = d3.rollup(
             filteredPropertiesYear,
             (v) => d3.sum(v, (d) => d.TOTAL_VALUE),
-            (d) => d.GIS_ID,
+            (d) => d.GIS_ID
         );
         filteredPropertiesYear = filteredPropertiesYear.map((property) => {
             let id = property.GIS_ID;
@@ -140,12 +140,12 @@
                 return incomeFilter === 1000000
                     ? true
                     : property.TOTAL_VALUE * 0.32 < incomeFilter;
-            },
+            }
         );
         let totalUnitsYearIncome = d3.rollup(
             filteredPropertiesYearIncome,
             (v) => v.length,
-            (d) => d.GIS_ID,
+            (d) => d.GIS_ID
         );
         let unique = {};
         filteredPropertiesYear = filteredPropertiesYear
@@ -189,7 +189,7 @@
                     number_affordable: _filteredPropertiesYearIncome.length,
                     median_value: d3.median(
                         _filteredPropertiesYear,
-                        (d) => d.TOTAL_VALUE,
+                        (d) => d.TOTAL_VALUE
                     ),
                 };
             }
@@ -210,7 +210,7 @@
     <svelte:fragment slot="viz">
         <header>
             <div>
-                <h4>New Developments in Boston in {yearFilter}</h4>
+                <h4>New Developments in Boston</h4>
                 <p>One Dot per Development</p>
             </div>
             <label>
@@ -228,6 +228,28 @@
                 {/if}
             </label>
         </header>
+        <div class="summary">
+            <h3>
+                With your income of <span class="value"
+                    >{#if incomeFilter === 1000000}
+                        <year>$1,000,000+</year>
+                    {:else}
+                        <year>{USDollar.format(incomeFilter)}</year>
+                    {/if}</span
+                >
+                you can afford
+                <span class="value"
+                    >{(
+                        (statsByYear[yearFilter]?.number_affordable /
+                            statsByYear[yearFilter]?.number_built) *
+                        100
+                    ).toLocaleString(undefined, {
+                        maximumFractionDigits: 2,
+                    })}%</span
+                >
+                of the units built in <span class="value">{yearFilter}</span>
+            </h3>
+        </div>
         <div id="mapone" class="map">
             <svg>
                 {#key mapViewChanged}
@@ -237,7 +259,7 @@
                             r={radiusScale(property.totalUnitsYear)}
                             fill={colorScale(
                                 property.totalUnitsYearIncome /
-                                    property.totalUnitsYear,
+                                    property.totalUnitsYear
                             )}
                             fill-opacity="0.7"
                             stroke="white"
@@ -297,7 +319,7 @@
                                     >Average new unit price:
                                     {USDollar.format(
                                         property.totalValueYear /
-                                            property.totalUnitsYear,
+                                            property.totalUnitsYear
                                     )}
                                 </tspan>
                             </text>
@@ -463,7 +485,7 @@
                                 opacity="0.5"
                                 fill={handleColor(
                                     property.TOTAL_VALUE,
-                                    incomeFilter,
+                                    incomeFilter
                                 )}
                             ></circle>
                         {/each}

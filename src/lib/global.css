@@ -101,6 +101,18 @@ main {
 
 .info .stat p {
     color: #ffee91;
+    margin-bottom: 0;
+}
+.info .stat h2 {
+    margin-top: 0;
+}
+.summary {
+    text-align: center;
+}
+.summary .value {
+    background-color: #ddd;
+    border-radius: 5px;
+    padding: 3px 7px;
 }
 /* header {
     display: flex;
