@@ -80,7 +80,23 @@
     </h3>
   </div>
 
+  <div class="intro">
+    <h3>
+      <b>
+        It's clear from these case studies that the construction of luxury
+        developments is <em>not</em> the answer to addressing Boston's housing crisis.</b
+      >
+      Neighboring house prices continue to rise during and after the development
+      of luxury high-rises. More housing - and specifically, more affordable housing
+      - are critically needed.
+    </h3>
+  </div>
+
   <VisThree />
+
+  <div class="intro">
+    <h3>It's clear that lol.</h3>
+  </div>
 </div>
 
 <style>
