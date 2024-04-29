@@ -79,7 +79,7 @@
             <b
                 >But, is this true? How have luxury developments in Boston
                 affected house prices in their surrounding neighborhoods?</b
-            ><br /><br />
+            >
             Let's take a closer look at One Dalton...
         </h3>
     </div>
@@ -90,19 +90,39 @@
         <h3>
             <b>
                 It's clear from these case studies that the construction of
-                luxury developments is <em>not</em> the answer to addressing Boston's
+                luxury high-rises is <em>not</em> the answer to addressing Boston's
                 housing crisis.</b
             >
-            Neighboring house prices continue to rise during and after the development
-            of luxury high-rises. More housing - and specifically, more affordable
-            housing - are critically needed.
+            Neighboring house prices continue to rise during and after their development.
+            We find no evidence of a trickle-down effect from the (modest) increase
+            in housing supply resulting from luxury developments.
+            <br /><br />
+            To further emphasize the dire nature of the situation,
+            <b
+                >let's see just how much
+                <em>faster</em> housing prices are rising relative to household incomes</b
+            > - the true measure of affordability.
         </h3>
     </div>
-
     <VisThree />
 
     <div class="content">
-        <h3>It's clear that lol</h3>
+        <h3>
+            In summary, our analysis shows that<br />
+            1) In the past few decades, Boston developers are constructing
+            <b>only for the rich.</b><br />
+            2)
+            <b
+                >Focusing on luxury developments alone does not benefit housing
+                affordability</b
+            >; rather, neighboring prices continue to rise during and after
+            their construction.<br />
+            3) As a result,
+            <b>home prices are rapidly outpacing household incomes</b>,
+            worsening the affordability crisis.<br /><br />
+            More housing - and specifically, more affordable housing - is critically
+            needed.
+        </h3>
     </div>
 </div>
 

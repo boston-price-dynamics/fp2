@@ -81,11 +81,11 @@ main {
 }
 
 .content {
-    height: 70vh;
+    height: 100vh;
     padding: 0 100px;
     display: flex;
     align-items: center;
-    justify-content: center; 
+    justify-content: center;
 }
 
 #viz3 .story,
@@ -131,6 +131,7 @@ main {
     top: -70px;
     left: 150px;
 }
+
 #viz3 .explanation:after {
     content: "";
     position: absolute;
