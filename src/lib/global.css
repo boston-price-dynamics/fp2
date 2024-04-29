@@ -51,6 +51,19 @@ main {
     color:#ffee91;
 }
 
+.intro {
+    height: 70vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.intro h3 {
+    /* background-color: #2c2f39; */
+    padding: 5rem 7rem;
+    /* color: #fff; */
+}
+
 .sep {
     margin-bottom: 30px;
 }
