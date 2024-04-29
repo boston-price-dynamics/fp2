@@ -13,6 +13,7 @@
 
     let properties = [];
     let incomes = [];
+    let incomesToCdf = {};
     let radiusScale;
     onMount(async () => {
         map = new mapboxgl.Map({
@@ -48,7 +49,10 @@
             "https://raw.githubusercontent.com/boston-price-dynamics/fp2/main/income_dist.csv",
             d3.autoType,
         );
-        console.log(incomes);
+
+        for (let it of incomes) {
+            incomesToCdf[it.income] = it.cdf;
+        }
     });
 
     function getCoords(property) {
@@ -92,7 +96,7 @@
     }
 
     function handleColor(value, incomeFilter) {
-        if (incomeFilter === 1000000 || value * 0.32 < incomeFilter) {
+        if (incomeFilter === 1000000 || value * 0.3 < incomeFilter) {
             return "#1a9850";
         }
         return "#d73027";
@@ -146,7 +150,7 @@
             (property) => {
                 return incomeFilter === 1000000
                     ? true
-                    : property.TOTAL_VALUE * 0.32 < incomeFilter;
+                    : property.TOTAL_VALUE * 0.3 < incomeFilter;
             },
         );
         let totalUnitsYearIncome = d3.rollup(
@@ -189,7 +193,7 @@
                     _filteredPropertiesYear.filter((property) => {
                         return incomeFilter === 1000000
                             ? true
-                            : property.TOTAL_VALUE * 0.32 < incomeFilter;
+                            : property.TOTAL_VALUE * 0.3 < incomeFilter;
                     });
                 statsByYear[year] = {
                     number_built: _filteredPropertiesYear.length,
@@ -213,6 +217,7 @@
     let width = 500;
     let height = 200;
     let padding = { top: 20, right: 15, bottom: 20, left: 25 };
+    let xTicks = [0, 200000, 400000, 600000, 800000, 1000000];
 
     $: xScale = d3
         .scaleLinear()
@@ -232,11 +237,39 @@
 
 <div class="chart">
     <svg>
-        <!-- data -->
         <path class="path-area" d={area} />
         <path class="path-line" d={path} />
+        <g class="axis x-axis">
+            {#each xTicks as tick}
+                <g
+                    class="tick tick-{tick}"
+                    transform="translate({xScale(tick)},{height})"
+                >
+                    <line y1="-{height}" y2="-{padding.bottom}" x1="0" x2="0" />
+                    <text y="-2" font-size="10"
+                        >{width > 380
+                            ? USDollar.format(tick)
+                            : formatMobile(tick)}</text
+                    >
+                </g>
+            {/each}
+            <g
+                class="tick highlight-tick"
+                transform="translate({xScale(incomeFilter)},{height})"
+            >
+                <line y1="-{height}" y2="-{padding.bottom}" x1="0" x2="0" />
+            </g>
+        </g>
     </svg>
 </div>
+<p>
+    Your household income is greater than {Math.min(
+        incomesToCdf[Math.round(incomeFilter / 5000) * 5000] * 100,
+        99,
+    )?.toLocaleString(undefined, {
+        maximumFractionDigits: 2,
+    }) ?? 0}% of other Boston households
+</p>
 <Scrolly
     bind:progress={yearProgress}
     --scrolly-layout="viz-first"
@@ -608,5 +641,44 @@
         width: 100%;
         height: 200px;
         overflow: visible;
+    }
+    .tick {
+        font-size: 0.725em;
+        font-weight: 200;
+    }
+
+    /* .tick line {
+        stroke: #888;
+        stroke-dasharray: 2;
+    } */
+
+    .tick text {
+        fill: #888;
+        text-anchor: start;
+    }
+
+    .tick.tick-0 line {
+        stroke: #888;
+        stroke-dasharray: 0;
+    }
+
+    .tick.highlight-tick line {
+        stroke: red;
+        stroke-dasharray: 0;
+        stroke-width: 3;
+    }
+
+    .x-axis .tick text {
+        text-anchor: middle;
+    }
+    .path-line {
+        fill: none;
+        stroke: rgb(0, 100, 100);
+        stroke-linejoin: round;
+        stroke-linecap: round;
+        stroke-width: 2;
+    }
+    .path-area {
+        fill: rgba(0, 100, 100, 0.2);
     }
 </style>
