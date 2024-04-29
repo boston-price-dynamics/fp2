@@ -25,7 +25,7 @@
 
     onMount(async () => {
         map = new mapboxgl.Map({
-            container: "map",
+            container: "viz2",
             style: "mapbox://styles/mapbox/standard",
             center: [-71.08401, 42.34577],
             zoom: 16,
@@ -79,10 +79,10 @@
 
     <svelte:fragment slot="viz">
         <p class="timeline">{mapMaxtime}</p>
-        <div id="map">
+        <div id="viz2">
             <svg>
-                {#key mapViewChanged}
-                    {#each filteredBuildings as building}
+                {#each filteredBuildings as building}
+                    {#key mapViewChanged}
                         <circle
                             {...getCoords(building)}
                             r="7"
@@ -90,8 +90,8 @@
                                 parseInt(building.TOTAL_VALUE.replace(/,/g, ""))
                             )}
                         />
-                    {/each}
-                {/key}
+                    {/key}
+                {/each}
             </svg>
         </div>
     </svelte:fragment>
@@ -99,7 +99,7 @@
 
 <style>
     @import url("$lib/global.css");
-    #map {
+    #viz2 {
         flex: 1;
         min-height: 70vh;
         min-width: 50%;
