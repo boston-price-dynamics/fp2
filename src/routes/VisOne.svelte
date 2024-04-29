@@ -4,6 +4,7 @@
     import { onMount } from "svelte";
     import * as d3 from "d3";
     import Scrolly from "svelte-scrolly";
+    import Countup from "svelte-countup";
 
     mapboxgl.accessToken =
         "pk.eyJ1Ijoianlvb25zb25nIiwiYSI6ImNsdW95emJzMzIxMDQya3FwcXc1NzA4c2sifQ.C9_2pEU8Z00WnIWNndTg_Q";
@@ -680,7 +681,8 @@
                 )?.toLocaleString(undefined, {
                     maximumFractionDigits: 2,
                 }) ?? 0}%</b
-            > of new housing units developed between 2000 and 2022.
+            >
+            of new housing units developed between 2000 and 2022.
         </h3>
     </div>
 </div>
