@@ -161,7 +161,7 @@
             row.dt = new Date(row.date);
         });
 
-        buildings = await d3.csv("/full_years.csv");
+        buildings = await d3.csv("full_years.csv");
     });
 
     let timelineProgress = 100;
@@ -246,7 +246,9 @@
 
     .date-heading {
         font-weight: bold;
-        font-size: 30px; /* You can adjust the font size as needed */
+        font-size: 70px; /* You can adjust the font size as needed */
+        margin-top: 30px;
+        margin-bottom: 0;
     }
 
     img {
