@@ -363,7 +363,7 @@
                 {/key}
             </svg>
             <div class="label">
-                Percent change in Income <br />from 2000 to {progress >= 90
+                Percent change in House Price <br />from 2000 to {progress >= 90
                     ? 2022
                     : 2000 + parseInt(((progress + 10) / 100) * 22)}<br />
                 <strong
@@ -374,7 +374,7 @@
                 >
             </div>
             <div class="label">
-                Percent change in House Price<br />from 2000 to {progress >= 90
+                Percent change in Income<br />from 2000 to {progress >= 90
                     ? 2022
                     : 2000 + parseInt(((progress + 10) / 100) * 22)}<br />
                 <strong
