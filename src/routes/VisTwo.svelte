@@ -11,15 +11,26 @@
     let timelineData = [];
     let map;
     let buildings = [];
+    let mappings = [];
     let filteredBuildings;
+    let features;
 
     function getCoords(building) {
-        console.log(building);
         let lat = building.lat;
         let long = building.long;
         let point = new mapboxgl.LngLat(long, lat);
         let { x, y } = map.project(point);
         return { cx: x, cy: y };
+    }
+    function getId(building, mappings) {
+        const found = mappings.find(
+            (b) =>
+                b.ST_NUM === building.ST_NUM && b.ST_NAME === building.ST_NAME
+        );
+        if (found) {
+            return found.mapboxid;
+        }
+        return -1;
     }
     let mapViewChanged = 0;
     $: map?.on("move", (evt) => mapViewChanged++);
@@ -90,24 +101,16 @@
 
         await new Promise((resolve) => map.on("load", resolve));
         // map.scrollZoom.disable();
-        map.setFeatureState(
-            {
-                source: "composite",
-                sourceLayer: "building",
-                id: 818117637,
-            },
-            {
-                hover: true,
-            }
-        );
-
-        console.log(
-            map.getFeatureState({
-                source: "composite",
-                sourceLayer: "building",
-                id: 818117637,
-            })
-        );
+        // map.setFeatureState(
+        //     {
+        //         source: "composite",
+        //         sourceLayer: "building",
+        //         id: 818117637,
+        //     },
+        //     {
+        //         hover: true,
+        //     }
+        // );
 
         // let fHover;
 
@@ -154,6 +157,23 @@
         });
 
         buildings = await d3.csv("full_years.csv");
+
+        mappings = await d3.csv("addr_to_mapbox.csv");
+
+        const ids = buildings.map((b) => getId(b, mappings));
+        let set = new Set(ids);
+        const uniqueIds = Array.from(set.values());
+
+        const array = ["match", ["get", "id"]];
+        for (let id of uniqueIds) {
+            if (id >= 0) {
+                array.push(id);
+                array.push("red");
+            }
+        }
+        array.push("blue");
+        console.log(array);
+        map.setPaintProperty("building", "fill-color", array);
     });
 
     let timelineProgress = 100;
@@ -164,11 +184,38 @@
         .range([0, 100]);
     $: mapMaxtime = timeScale.invert(timelineProgress).getFullYear();
 
-    let features;
     $: {
         filteredBuildings = buildings.filter((building) => {
             return new Date(building.Year).getFullYear() === mapMaxtime;
         });
+
+        const allIds = buildings.map((building) => getId(building, mappings));
+        const idsToColor = filteredBuildings.map((building) =>
+            getId(building, mappings)
+        );
+
+        // // reset color
+        // for (let id of allIds) {
+        //     map.removeFeatureState({
+        //         source: "composite",
+        //         sourceLayer: "building",
+        //         id: id,
+        //     });
+        // }
+
+        // // set color for filtered buildings
+        // for (let id of idsToColor) {
+        //     map.setFeatureState(
+        //         {
+        //             source: "composite",
+        //             sourceLayer: "building",
+        //             id: id,
+        //         },
+        //         {
+        //             hover: true,
+        //         }
+        //     );
+        // }
     }
     let colorScale = d3
         .scaleLinear()
@@ -197,9 +244,10 @@
     <svelte:fragment slot="viz">
         <!-- <p class="timeline">{mapMaxtime}</p> -->
         <div id="viz2">
-            <svg>
+            <!-- <svg>
                 {#each filteredBuildings as building}
                     {#key mapViewChanged}
+                        <text>{getId(building, mappings)}</text>
                         <circle
                             {...getCoords(building)}
                             r={radiusScale(
@@ -214,7 +262,7 @@
                         />
                     {/key}
                 {/each}
-            </svg>
+            </svg> -->
         </div>
         <div id="map_legend">
             <div>Property value:</div>
