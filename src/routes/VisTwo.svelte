@@ -30,7 +30,7 @@
             center: [-71.0841159, 42.3449576],
             zoom: 15.85,
             pitch: 60,
-            dragPan: false,
+            // dragPan: false,
         });
 
         map.on("style.load", () => {
@@ -88,7 +88,7 @@
             );
         });
         await new Promise((resolve) => map.on("load", resolve));
-        map.scrollZoom.disable();
+        // map.scrollZoom.disable();
         map.setFeatureState(
             {
                 source: "composite",
