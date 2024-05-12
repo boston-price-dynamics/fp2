@@ -88,7 +88,7 @@
             );
         });
         await new Promise((resolve) => map.on("load", resolve));
-
+        map.scrollZoom.disable();
         map.setFeatureState(
             {
                 source: "composite",
