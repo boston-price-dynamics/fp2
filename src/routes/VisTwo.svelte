@@ -28,8 +28,9 @@
             container: "viz2",
             style: "mapbox://styles/jyoonsong/cluq04ktu05cr01qqb4rp4v4f",
             center: [-71.0841159, 42.3449576],
-            zoom: 16,
+            zoom: 15.85,
             pitch: 60,
+            dragPan: false,
         });
 
         map.on("style.load", () => {
@@ -87,14 +88,7 @@
             );
         });
         await new Promise((resolve) => map.on("load", resolve));
-        console.log(
-            map.getFeatureState({
-                source: "composite",
-                sourceLayer: "building",
-                id: 818117637,
-            }),
-        );
-
+        map.scrollZoom.disable();
         map.setFeatureState(
             {
                 source: "composite",
@@ -202,7 +196,7 @@
     {#each timelineData as item, index}
         <div class="info-wrapper" style="text-align: center;">
             <div class="info">
-                <h1 class="date-heading">{item.date}</h1>
+                <h1 class="date-heading">{item.year}</h1>
                 <h2 class="event-heading">{item.event}</h2>
                 <p>{item.description}</p>
                 {#if item.image !== ""}
@@ -216,7 +210,7 @@
     {/each}
 
     <svelte:fragment slot="viz">
-        <p class="timeline">{mapMaxtime}</p>
+        <!-- <p class="timeline">{mapMaxtime}</p> -->
         <div id="viz2">
             <svg>
                 {#each filteredBuildings as building}
@@ -235,6 +229,12 @@
                     {/key}
                 {/each}
             </svg>
+        </div>
+        <div id="map_legend">
+            <div>Property value:</div>
+            {#each [0, 500000, 1000000, 1500000, 2000000, 2500000, 3000000] as color, index}
+                <div style="--color: {colorScale(color)}">${color}</div>
+            {/each}
         </div>
     </svelte:fragment>
 </Scrolly>
@@ -291,5 +291,18 @@
 
     .info h2 {
         margin: 0;
+    }
+    #map_legend {
+        display: flex;
+        justify-content: space-between;
+        gap: 1px;
+        margin-top: 5px;
+
+        & div {
+            flex: 1;
+            text-align: center;
+            background-color: var(--color);
+            font-size: 9px;
+        }
     }
 </style>

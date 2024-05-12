@@ -80,8 +80,14 @@
                 >But, is this true? How have luxury developments in Boston
                 affected house prices in their surrounding neighborhoods?</b
             >
-            Let's take a closer look at One Dalton...
+            One Dalton is a 850,000 sq ft skyscraper in Boston.
+            It is the tallest residential building in New England, home to 
+            the Four Seasons Hotel and private residences. Let's take a closer look at One Dalton...
         </h3>
+    </div>
+
+    <div>
+        <h3>Scroll through the years to see how One Dalton has effected the property values of the surrouding homes.</h3>
     </div>
 
     <VisTwo />
@@ -124,6 +130,31 @@
             needed.
         </h3>
     </div>
+
+    <div class="references">
+        <h3>
+            <b>Authored by: Jerry Li, Riley Oh, Consecrata Rozario, Jaeyoon Song  </b>  <br />
+            This project was developed with guidance and feedback from the <a href = "https://www.mapc.org/">Metropolitan Area Planning Commission (MAPC)</a>.<br />
+            <br />
+            <b>In this interactive visualization we used the following data sources:</b><br />
+            
+            Residential sales data in Metro Boston, 2000-2023<br />
+            Corporate ownership rates and owner occupancy rates in Boston neighborhoods, 2004-2024 <br />
+            Metro Boston property assessment data, 2024 <br />
+            <a href = "https://data.boston.gov/dataset/property-assessment">Boston property assesments 2010-2024 </a><br />
+
+
+            <br />
+            The second visualization was inspired by a similar visualization in Boston Globe's 
+            <a href = "https://apps.bostonglobe.com/2023/10/special-projects/spotlight-boston-housing/boston-towers-of-wealth/">
+                Reckoning with Boston's Towers of Wealth</a>.<br />
+            <a href = "https://en.wikipedia.org/wiki/One_Dalton">Wiki: One Dalton</a><br />
+            <a href = "https://www.bostonplans.org/projects/development-projects/1-dalton-street">Boston Planning and Development Agency One Dalton Street records</a>
+            <br /><br />
+            We would also like to thank and acknowledge MIT's 6.C35 instructors and TAs for their instruction and guidance with this project. 
+        </h3>
+    </div>
+
 </div>
 
 <style>
