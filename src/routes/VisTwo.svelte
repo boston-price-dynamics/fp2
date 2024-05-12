@@ -14,6 +14,7 @@
     let filteredBuildings;
 
     function getCoords(building) {
+        console.log(building);
         let lat = building.lat;
         let long = building.long;
         let point = new mapboxgl.LngLat(long, lat);
@@ -37,8 +38,7 @@
             // Insert the layer beneath any symbol layer.
             const layers = map.getStyle().layers;
             const labelLayerId = layers.find(
-                (layer) =>
-                    layer.type === "symbol" && layer.layout["text-field"],
+                (layer) => layer.type === "symbol" && layer.layout["text-field"]
             ).id;
 
             // The 'building' layer in the Mapbox Streets
@@ -84,7 +84,7 @@
                         "fill-extrusion-opacity": 0.8,
                     },
                 },
-                labelLayerId,
+                labelLayerId
             );
         });
         await new Promise((resolve) => map.on("load", resolve));
@@ -97,7 +97,7 @@
             },
             {
                 hover: true,
-            },
+            }
         );
 
         console.log(
@@ -105,7 +105,7 @@
                 source: "composite",
                 sourceLayer: "building",
                 id: 818117637,
-            }),
+            })
         );
 
         let fHover;
@@ -144,7 +144,7 @@
                 },
                 {
                     hover: false,
-                },
+                }
             );
         }
 
@@ -161,7 +161,7 @@
                 },
                 {
                     hover: true,
-                },
+                }
             );
         }
 
@@ -219,9 +219,7 @@
                             {...getCoords(building)}
                             r="7"
                             fill={colorScale(
-                                parseInt(
-                                    building.TOTAL_VALUE.replace(/,/g, ""),
-                                ),
+                                parseInt(building.TOTAL_VALUE.replace(/,/g, ""))
                             )}
                             fill-opacity="0.7"
                             stroke="white"
