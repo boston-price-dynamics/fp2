@@ -56,7 +56,7 @@
                         "fill-extrusion-color": [
                             "case",
                             ["boolean", ["feature-state", "hover"], false],
-                            "#000",
+                            ["rgb", ["feature-state", "temperature"], 0, 0],
                             "#ddd",
                         ],
 
@@ -98,6 +98,7 @@
             },
             {
                 hover: true,
+                temperature: 100,
             },
         );
 
