@@ -66,11 +66,11 @@
                         "fill-extrusion-height": [
                             "interpolate",
                             ["linear"],
-                            ["zoom"],
+                            ["zoom"], // for one dalton, animate the height from 2017 to 2019
                             15,
                             0,
                             15.05,
-                            ["get", "height"],
+                            ["get", "height"], // retrieve the correct height (full height)
                         ],
                         "fill-extrusion-base": [
                             "interpolate",
@@ -99,6 +99,7 @@
             {
                 hover: true,
                 temperature: 100,
+                onedaltonheight: {}, // reactive from 2017 to 2019
             },
         );
 
