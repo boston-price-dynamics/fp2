@@ -22,7 +22,7 @@
     }
     let mapViewChanged = 0;
     $: map?.on("move", (evt) => mapViewChanged++);
-
+    let ids = [];
     onMount(async () => {
         map = new mapboxgl.Map({
             container: "viz2",
@@ -87,6 +87,7 @@
                 labelLayerId,
             );
         });
+
         await new Promise((resolve) => map.on("load", resolve));
         // map.scrollZoom.disable();
         map.setFeatureState(
@@ -108,62 +109,44 @@
             }),
         );
 
-        let fHover;
+        // let fHover;
 
-        map.on("click", function (e) {
-            var features = map.queryRenderedFeatures(e.point, {
-                layers: ["add-3d-buildings"],
-            });
-            console.log(features[0].id);
-        });
+        // map.on("mousemove", function (e) {
+        //     var features = map.queryRenderedFeatures(e.point, {
+        //         layers: ["add-3d-buildings"],
+        //     });
+        //     //we will change pointer and color for 42455719
+        //     if (features[0]) {
+        //         mouseover(features[0]);
+        //     } else {
+        //         mouseout();
+        //     }
+        // });
 
-        map.on("mousemove", function (e) {
-            var features = map.queryRenderedFeatures(e.point, {
-                layers: ["add-3d-buildings"],
-            });
-            //we will change pointer and color for 818117637
-            if (features[0]) {
-                mouseover(features[0]);
-            } else {
-                mouseout();
-            }
-        });
+        // map.on("mouseout", function (e) {
+        //     mouseout();
+        // });
 
-        map.on("mouseout", function (e) {
-            mouseout();
-        });
+        // map.on("mouseout", function (e) {
+        //     mouseout();
+        // });
 
-        function mouseout() {
-            if (!fHover) return;
-            map.getCanvasContainer().style.cursor = "default";
-            map.setFeatureState(
-                {
-                    source: fHover.source,
-                    sourceLayer: fHover.sourceLayer,
-                    id: fHover.id,
-                },
-                {
-                    hover: false,
-                },
-            );
-        }
+        // function mouseover(feature) {
+        //     fHover = feature;
+        //     // console.log(fHover.id);
+        //     map.getCanvasContainer().style.cursor = "pointer";
 
-        function mouseover(feature) {
-            fHover = feature;
-            console.log(fHover.id);
-            map.getCanvasContainer().style.cursor = "pointer";
-
-            map.setFeatureState(
-                {
-                    source: fHover.source,
-                    sourceLayer: fHover.sourceLayer,
-                    id: fHover.id,
-                },
-                {
-                    hover: true,
-                },
-            );
-        }
+        //     map.setFeatureState(
+        //         {
+        //             source: fHover.source,
+        //             sourceLayer: fHover.sourceLayer,
+        //             id: fHover.id,
+        //         },
+        //         {
+        //             hover: true,
+        //         },
+        //     );
+        // }
 
         timelineData = await d3.json("One Dalton.json");
         timelineData.forEach((row) => {
@@ -181,6 +164,7 @@
         .range([0, 100]);
     $: mapMaxtime = timeScale.invert(timelineProgress).getFullYear();
 
+    let features;
     $: {
         filteredBuildings = buildings.filter((building) => {
             return new Date(building.Year).getFullYear() === mapMaxtime;
@@ -190,6 +174,7 @@
         .scaleLinear()
         .domain([0, 3000000])
         .range(["white", "#d73027"]); // Adjust the range of colors as needed
+    let radiusScale = d3.scaleLinear().domain([0, 5000000]).range([0, 25]);
 </script>
 
 <Scrolly bind:progress={timelineProgress} --scrolly-viz-width="500px">
@@ -217,7 +202,11 @@
                     {#key mapViewChanged}
                         <circle
                             {...getCoords(building)}
-                            r="7"
+                            r={radiusScale(
+                                parseInt(
+                                    building.TOTAL_VALUE.replace(/,/g, ""),
+                                ),
+                            )}
                             fill={colorScale(
                                 parseInt(
                                     building.TOTAL_VALUE.replace(/,/g, ""),
@@ -225,6 +214,7 @@
                             )}
                             fill-opacity="0.7"
                             stroke="white"
+                            opacity="60%"
                         />
                     {/key}
                 {/each}
