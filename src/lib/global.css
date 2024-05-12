@@ -88,12 +88,12 @@ main {
     justify-content: center;
 }
 
-.references{
+.references {
     height: 100vh;
     padding: 0 100px;
     display: flex;
-    align-items: left;
-    justify-content: left;
+    align-items: center;
+    justify-content: center;
 }
 
 
@@ -174,20 +174,24 @@ main {
 .info-wrapper {
     margin-bottom: 540px;
 }
+
 .info {
     background-color: #2c2f39;
     padding: 1rem 2rem;
     color: #fff;
 }
+
 .info .event-heading {
     color: #ffee91;
 }
+
 .info .event-link {
     display: block;
     color: #bbb;
     text-decoration: none;
     margin-bottom: 30px;
 }
+
 .info .event-link:visited {
     color: #bbb;
     text-decoration: none;
