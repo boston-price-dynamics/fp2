@@ -80,8 +80,14 @@
                 >But, is this true? How have luxury developments in Boston
                 affected house prices in their surrounding neighborhoods?</b
             >
-            Let's take a closer look at One Dalton...
+            One Dalton is a 850,000 sq ft skyscraper in Boston.
+            It is the tallest residential building in New England, home to 
+            the Four Seasons Hotel and private residences. Let's take a closer look at One Dalton...
         </h3>
+    </div>
+
+    <div>
+        <h3>Scroll through the years to see how One Dalton has effected the property values of the surrouding homes.</h3>
     </div>
 
     <VisTwo />
@@ -124,6 +130,20 @@
             needed.
         </h3>
     </div>
+
+    <div class="references">
+        <h3>
+            <b>In this interactive visualization we used the following data sources:</b>
+            <br />
+            <p>lksdjl</p>
+            1)<br />
+            2)<br />
+            3) <br />
+            We referenced and used information from the following websites:       <br />
+            <a href = "https://en.wikipedia.org/wiki/One_Dalton">Wiki: One Dalton</a><br />
+        </h3>
+    </div>
+
 </div>
 
 <style>
