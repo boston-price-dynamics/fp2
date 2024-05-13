@@ -15,6 +15,9 @@
     let filteredBuildings;
     let mapMaxtime = 2013;
     let timelineProgress = 100;
+    let minPercent = -1;
+    let maxPercent = 1;
+    let colorScale;
 
     function getCoords(building) {
         let lat = building.lat;
@@ -86,7 +89,11 @@
                     paint: {
                         "fill-extrusion-color": [
                             "case",
-                            ["boolean", ["feature-state", "hover"], false],
+                            [
+                                "boolean",
+                                ["feature-state", "colorChanged"],
+                                false,
+                            ],
                             [
                                 "rgb",
                                 ["feature-state", "redLevel"],
@@ -117,6 +124,60 @@
                             ],
                             ["get", "height"],
                         ],
+
+                        "fill-extrusion-opacity": 0.2,
+                    },
+                },
+                labelLayerId
+            );
+            map.addLayer(
+                {
+                    id: "add-3d-buildings-1",
+                    source: "composite",
+                    "source-layer": "building",
+                    filter: ["==", "extrude", "true"],
+                    type: "fill-extrusion",
+                    minzoom: 15,
+                    paint: {
+                        "fill-extrusion-color": [
+                            "case",
+                            [
+                                "boolean",
+                                ["feature-state", "colorChanged"],
+                                false,
+                            ],
+                            [
+                                "rgb",
+                                ["feature-state", "redLevel"],
+                                ["feature-state", "greenLevel"],
+                                ["feature-state", "blueLevel"],
+                            ],
+                            "#ddd",
+                        ],
+
+                        // Use an 'interpolate' expression to
+                        // add a smooth transition effect to
+                        // the buildings as the user zooms in.
+                        "fill-extrusion-height": [
+                            "case",
+                            [
+                                "boolean",
+                                ["feature-state", "heightChanged"],
+                                false,
+                            ],
+                            [
+                                "interpolate",
+                                ["linear"],
+                                ["feature-state", "heightLevel"],
+                                0,
+                                0,
+                                1,
+                                ["get", "height"],
+                            ],
+                            0,
+                        ],
+
+                        "fill-extrusion-opacity": 1,
                     },
                 },
                 labelLayerId
@@ -195,17 +256,21 @@
             return new Date(building.Year).getFullYear() === mapMaxtime;
         });
 
+        const allPercentages = mappings.map((m) => parseFloat(m.PercentChg));
+        minPercent = Math.min(...allPercentages);
+        maxPercent = Math.max(...allPercentages);
+
+        console.log(minPercent, maxPercent);
+        colorScale = d3
+            .scaleLinear()
+            .domain([minPercent * 100, maxPercent * 100])
+            .range(["white", "#d73027"]); // Adjust the range of colors as needed
+
         const buildingInfos = buildings.map((b) =>
             getInfo(b, mappings, mapMaxtime)
         );
         const uniqueInfos = removeDuplicates(buildingInfos);
         if (uniqueInfos?.length > 0) {
-            const allPercentages = mappings.map((m) =>
-                parseFloat(m.PercentChg)
-            );
-            const minPercent = Math.min(...allPercentages);
-            const maxPercent = Math.max(...allPercentages);
-
             // map.scrollZoom.disable();
             for (let buildingInfo of uniqueInfos) {
                 const redRange = [255, 215];
@@ -235,11 +300,13 @@
                         id: buildingInfo.id,
                     },
                     {
-                        hover: true,
+                        colorChanged: true,
+                        heightChanged: true,
                         isMarked: true,
                         redLevel: redLevel,
                         greenLevel: greenLevel,
                         blueLevel: blueLevel,
+                        heightLevel: 1,
                     }
                 );
             }
@@ -259,16 +326,33 @@
                     id: 818117637,
                 },
                 {
-                    hover: true,
+                    colorChanged: true,
                     heightChanged: true,
-                    redLevel: 255,
-                    greenLevel: 39,
-                    blueLevel: 255,
+                    redLevel: 70,
+                    greenLevel: 70,
+                    blueLevel: 70,
                     heightLevel: heightLevel, // reactive from 2017 to 2019
                 }
             );
+
+            for (let exception of [536526392, 29945243]) {
+                map.setFeatureState(
+                    {
+                        source: "composite",
+                        sourceLayer: "building",
+                        id: exception,
+                    },
+                    {
+                        colorChanged: false,
+                        heightChanged: true,
+                        heightLevel: 0, // reactive from 2017 to 2019
+                    }
+                );
+            }
         }
     }
+
+    console.log(minPercent, maxPercent);
 
     $: {
         buildings.sort((a, b) => new Date(a.Year) - new Date(b.Year));
@@ -317,11 +401,6 @@
             }
         });
     }
-
-    let colorScale = d3
-        .scaleLinear()
-        .domain([0, 15]) //max percent change is 70
-        .range(["white", "#d73027"]); // Adjust the range of colors as needed
     let radiusScale = d3.scaleLinear().domain([0, 20]).range([0, 25]);
 </script>
 
@@ -367,7 +446,7 @@
         </div>
         <div id="map_legend">
             <div>Percent change in Property value:</div>
-            {#each [0, 5, 10, 15] as color, index}
+            {#each [-60, 0, 60, 120, 180] as color, index}
                 <div style="--color: {colorScale(color)}">{color}%</div>
             {/each}
         </div>
