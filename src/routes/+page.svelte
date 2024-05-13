@@ -9,6 +9,13 @@
   let opacity = 1;
   let scale = 1;
   let scaleText = 1;
+  let incomeFilter = 100000;
+
+  let USDollar = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  });
 
   onMount(async () => {
     document.addEventListener("scroll", (e) => {
@@ -63,12 +70,19 @@
       >
       In the ensuing visualization, we define an "affordable" unit based on the standard
       rule of spending no more than 30% of your income on housing costs. Based on
-      current mortgage rates, a house is affordable if it is no more than ~3.3x your
-      annual household income.
+      current mortgage rates, a house is affordable if it costs no more than ~3.3x
+      your annual household income.
     </h3>
+    <label id="income">
+      Enter your annual household income:
+      <div>
+        <input type="range" min="0" max="1000000" bind:value={incomeFilter} />
+        <year>{USDollar.format(incomeFilter)}</year>
+      </div>
+    </label>
   </div>
 
-  <VisOne />
+  <VisOne bind:incomeFilter />
 
   <!-- <LoremIpsum /> -->
   <div class="content">
@@ -146,17 +160,17 @@
         >In this interactive visualization we used the following data sources:</b
       ><br />
 
-      Residential sales data in Metro Boston, 2000-2023<br />
-      Corporate ownership rates and owner occupancy rates in Boston neighborhoods,
-      2004-2024 <br />
-      Metro Boston property assessment data, 2024 <br />
+      <a href="https://data.boston.gov/dataset/parcels-2023"
+        >City of Boston parcels, 2023</a
+      ><br />
       <a href="https://data.boston.gov/dataset/property-assessment"
-        >Boston property assesments 2010-2024
+        >Boston property assesments, 2010-2024
       </a><br />
+      <a href="https://data.census.gov/">American Community Survey, 2022</a><br
+      />
 
       <br />
-      The second visualization was inspired by a similar visualization in Boston
-      Globe's
+      The second visualization was inspired by the Boston Globe's
       <a
         href="https://apps.bostonglobe.com/2023/10/special-projects/spotlight-boston-housing/boston-towers-of-wealth/"
       >
@@ -177,4 +191,20 @@
 
 <style>
   @import url("$lib/global.css");
+  #income {
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-direction: column;
+    font-size: 18px;
+
+    & div {
+      display: flex;
+      justify-content: space-between;
+
+      & year {
+        font-size: 24px;
+      }
+    }
+  }
 </style>

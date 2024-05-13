@@ -117,7 +117,7 @@
 
     $: map?.on("move", (evt) => mapViewChanged++);
 
-    let incomeFilter = 100000;
+    export let incomeFilter;
 
     let progressToYearScale = d3
         .scaleLinear()

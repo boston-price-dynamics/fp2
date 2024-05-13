@@ -419,7 +419,7 @@
             </svg> -->
         </div>
         <div id="map_legend">
-            <div>Percent change in Property value:</div>
+            <div id="label">% Chg. in Property Value:</div>
             {#each [-30, 0, 30, 60, 90, 120, 150, 180] as color, index}
                 <div style="--color: {colorScale(color)}">{color}%</div>
             {/each}
@@ -491,6 +491,10 @@
             text-align: center;
             background-color: var(--color);
             font-size: 9px;
+        }
+
+        & #label {
+            flex: 2.5;
         }
     }
 </style>
