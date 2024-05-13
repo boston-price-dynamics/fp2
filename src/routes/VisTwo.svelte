@@ -100,8 +100,8 @@
                         "fill-extrusion-color": [
                             "case",
                             ["boolean", ["feature-state", "hover"], false],
-                            colorArray,
-                            "#000",
+                            ["rgb", ["feature-state", "temperature"], 0, 0],
+                            "#ddd",
                         ],
 
                         // Use an 'interpolate' expression to
@@ -110,11 +110,11 @@
                         "fill-extrusion-height": [
                             "interpolate",
                             ["linear"],
-                            ["zoom"],
+                            ["zoom"], // for one dalton, animate the height from 2017 to 2019
                             15,
                             0,
                             15.05,
-                            ["get", "height"],
+                            ["get", "height"], // retrieve the correct height (full height)
                         ],
                         "fill-extrusion-base": [
                             "interpolate",
@@ -158,6 +158,7 @@
 
         await new Promise((resolve) => map.on("load", resolve));
         // map.scrollZoom.disable();
+<<<<<<< HEAD
         // map.setFeatureState(
         //     {
         //         source: "composite",
@@ -168,6 +169,28 @@
         //         hover: true,
         //     }
         // );
+=======
+        map.setFeatureState(
+            {
+                source: "composite",
+                sourceLayer: "building",
+                id: 818117637,
+            },
+            {
+                hover: true,
+                temperature: 100,
+                onedaltonheight: {}, // reactive from 2017 to 2019
+            },
+        );
+
+        console.log(
+            map.getFeatureState({
+                source: "composite",
+                sourceLayer: "building",
+                id: 818117637,
+            }),
+        );
+>>>>>>> 10b3e399762f61bb0c842373c92e283fde2a353c
 
         // let fHover;
 
