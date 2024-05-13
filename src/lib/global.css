@@ -283,3 +283,29 @@ header year {
 h3 {
     font-weight: normal;
 }
+
+.intro {
+    width: 100%;
+    margin-bottom: 370px;
+}
+
+#income {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+#income .input-wrapper {
+    margin: 1rem 0;
+}
+
+#income input {
+    min-width: 370px;
+}
+
+#income .year-wrapper {
+    font-size: 70px;
+    text-align: center;
+    width: 100%;
+}
