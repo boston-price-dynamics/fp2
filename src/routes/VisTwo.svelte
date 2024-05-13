@@ -146,12 +146,7 @@
                                 ["feature-state", "colorChanged"],
                                 false,
                             ],
-                            [
-                                "rgb",
-                                ["feature-state", "redLevel"],
-                                ["feature-state", "greenLevel"],
-                                ["feature-state", "blueLevel"],
-                            ],
+                            ["feature-state", "color"],
                             "#ddd",
                         ],
 
@@ -263,7 +258,7 @@
         console.log(minPercent, maxPercent);
         colorScale = d3
             .scaleLinear()
-            .domain([minPercent * 100, maxPercent * 100])
+            .domain([-30, 180])
             .range(["white", "#d73027"]); // Adjust the range of colors as needed
 
         const buildingInfos = buildings.map((b) =>
@@ -273,25 +268,7 @@
         if (uniqueInfos?.length > 0) {
             // map.scrollZoom.disable();
             for (let buildingInfo of uniqueInfos) {
-                const redRange = [255, 215];
-                const greenRange = [255, 48];
-                const blueRange = [255, 39];
-
-                const srcMax = maxPercent - minPercent,
-                    adjValue = buildingInfo.percent - minPercent;
-
-                const redLevel = parseInt(
-                    (adjValue * (redRange[1] - redRange[0])) / srcMax +
-                        redRange[0]
-                );
-                const greenLevel = parseInt(
-                    (adjValue * (greenRange[1] - greenRange[0])) / srcMax +
-                        greenRange[0]
-                );
-                const blueLevel = parseInt(
-                    (adjValue * (blueRange[1] - blueRange[0])) / srcMax +
-                        blueRange[0]
-                );
+                const color = colorScale(buildingInfo.percent * 100);
 
                 map.setFeatureState(
                     {
@@ -303,9 +280,7 @@
                         colorChanged: true,
                         heightChanged: true,
                         isMarked: true,
-                        redLevel: redLevel,
-                        greenLevel: greenLevel,
-                        blueLevel: blueLevel,
+                        color: color,
                         heightLevel: 1,
                     }
                 );
@@ -328,9 +303,7 @@
                 {
                     colorChanged: true,
                     heightChanged: true,
-                    redLevel: 70,
-                    greenLevel: 70,
-                    blueLevel: 70,
+                    color: "rgb(70, 70, 70)",
                     heightLevel: heightLevel, // reactive from 2017 to 2019
                 }
             );
@@ -446,7 +419,7 @@
         </div>
         <div id="map_legend">
             <div>Percent change in Property value:</div>
-            {#each [-60, 0, 60, 120, 180] as color, index}
+            {#each [-30, 0, 30, 60, 90, 120, 150, 180] as color, index}
                 <div style="--color: {colorScale(color)}">{color}%</div>
             {/each}
         </div>
