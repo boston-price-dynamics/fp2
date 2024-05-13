@@ -30,7 +30,7 @@
             center: [-71.0841159, 42.3449576],
             zoom: 15.85,
             pitch: 60,
-            // dragPan: false,
+            dragPan: false,
         });
 
         map.on("style.load", () => {
@@ -89,7 +89,7 @@
         });
 
         await new Promise((resolve) => map.on("load", resolve));
-        // map.scrollZoom.disable();
+        map.scrollZoom.disable();
         map.setFeatureState(
             {
                 source: "composite",
@@ -155,7 +155,7 @@
             row.dt = new Date(row.date);
         });
 
-        buildings = await d3.csv("full_years.csv");
+        buildings = await d3.csv("full_years_new.csv");
     });
 
     let timelineProgress = 100;
@@ -172,11 +172,46 @@
             return new Date(building.Year).getFullYear() === mapMaxtime;
         });
     }
+
+
+
+    $: {    
+    buildings.sort((a, b) => new Date(a.Year) - new Date(b.Year));
+
+    buildings.forEach((building) => {
+        const currentYear = new Date(building.Year).getFullYear();
+        const prevYear = currentYear - 1;
+        if (prevYear >= 2010) {           
+        const filteredBuildingsPrevYear = buildings.filter((building) => {
+            return new Date(building.Year).getFullYear() === prevYear;})
+
+        const prevYearBuilding = filteredBuildingsPrevYear.find((prevBuilding) => {
+            return prevBuilding.ST_NUM === building.ST_NUM && prevBuilding.ST_NAME === building.ST_NAME;
+        });
+        if (prevYearBuilding !== undefined && parseInt(prevYearBuilding.TOTAL_VALUE.replace(/,/g, "")) > 0  && parseInt(building.TOTAL_VALUE.replace(/,/g, "")) > 0) { 
+            const percentChange = ((parseInt(building.TOTAL_VALUE.replace(/,/g, "")) - parseInt(prevYearBuilding.TOTAL_VALUE.replace(/,/g, ""))) / parseInt(prevYearBuilding.TOTAL_VALUE.replace(/,/g, ""))) * 100;
+            building.percentChange = percentChange;
+        } else {
+            building.percentChange = 0;
+        }
+        }
+        else{
+            building.percentChange = 0;
+        }
+
+    });
+
+
+}
+
+
+
+
     let colorScale = d3
         .scaleLinear()
-        .domain([0, 3000000])
+        .domain([0, 15]) //max percent change is 70
         .range(["white", "#d73027"]); // Adjust the range of colors as needed
-    let radiusScale = d3.scaleLinear().domain([0, 5000000]).range([0, 25]);
+    let radiusScale = d3.scaleLinear().domain([0, 20]).range([0, 25]);
 </script>
 
 <Scrolly bind:progress={timelineProgress} --scrolly-viz-width="500px">
@@ -205,14 +240,10 @@
                         <circle
                             {...getCoords(building)}
                             r={radiusScale(
-                                parseInt(
-                                    building.TOTAL_VALUE.replace(/,/g, ""),
-                                ),
+                                building.percentChange
                             )}
                             fill={colorScale(
-                                parseInt(
-                                    building.TOTAL_VALUE.replace(/,/g, ""),
-                                ),
+                                building.percentChange
                             )}
                             fill-opacity="0.7"
                             stroke="white"
@@ -223,9 +254,9 @@
             </svg>
         </div>
         <div id="map_legend">
-            <div>Property value:</div>
-            {#each [0, 500000, 1000000, 1500000, 2000000, 2500000, 3000000] as color, index}
-                <div style="--color: {colorScale(color)}">${color}</div>
+            <div>Percent change in Property value:</div>
+            {#each [0, 5, 10, 15] as color, index}
+                <div style="--color: {colorScale(color)}">{color}%</div>
             {/each}
         </div>
     </svelte:fragment>
