@@ -28,13 +28,28 @@
                 b.ST_NUM === building.ST_NUM && b.ST_NAME === building.ST_NAME
         );
         if (found) {
-            return found.mapboxid;
+            return { id: found.mapboxid, percent: found.PercentChg };
         }
-        return -1;
+        return { id: -1 };
+    }
+    function removeDuplicates(arr) {
+        const obj = {};
+
+        for (let i = 0, len = arr.length; i < len; i++) {
+            obj[arr[i]["id"]] = arr[i];
+        }
+
+        const newArr = new Array();
+
+        for (const key in obj) {
+            newArr.push(obj[key]);
+        }
+
+        return newArr;
     }
     let mapViewChanged = 0;
     $: map?.on("move", (evt) => mapViewChanged++);
-    let ids = [];
+
     onMount(async () => {
         map = new mapboxgl.Map({
             container: "viz2",
@@ -44,6 +59,24 @@
             pitch: 60,
             // dragPan: false,
         });
+
+        buildings = await d3.csv("full_years.csv");
+
+        mappings = await d3.csv("vistwo.csv");
+
+        const ids = buildings.map((b) => getId(b, mappings));
+        const uniqueIds = removeDuplicates(ids);
+        console.log(uniqueIds);
+
+        const colorArray = ["interpolate", ["linear"], ["get", "id"]];
+        const opacityArray = ["interpolate", ["linear"], ["get", "id"]];
+        for (let id of uniqueIds) {
+            if (id >= 0) {
+                colorArray.push(id);
+                colorArray.push("red");
+            }
+        }
+        array.push(false);
 
         map.on("style.load", () => {
             // Insert the layer beneath any symbol layer.
@@ -67,8 +100,8 @@
                         "fill-extrusion-color": [
                             "case",
                             ["boolean", ["feature-state", "hover"], false],
+                            colorArray,
                             "#000",
-                            "#ddd",
                         ],
 
                         // Use an 'interpolate' expression to
@@ -92,7 +125,31 @@
                             15.05,
                             ["get", "min_height"],
                         ],
-                        "fill-extrusion-opacity": 0.8,
+                        "fill-extrusion-opacity": [
+                            "interpolate",
+                            ["linear"],
+                            ["get", "id"],
+                            1,
+                            "#fff7ec",
+                            1.5,
+                            "#fee8c8",
+                            2,
+                            "#fdd49e",
+                            2.5,
+                            "#fdbb84",
+                            3,
+                            "#fc8d59",
+                            3.5,
+                            "#ef6548",
+                            4.5,
+                            "#d7301f",
+                            6.5,
+                            "#b30000",
+                            8.5,
+                            "#7f0000",
+                            10.5,
+                            "#000",
+                        ],
                     },
                 },
                 labelLayerId
@@ -155,25 +212,6 @@
         timelineData.forEach((row) => {
             row.dt = new Date(row.date);
         });
-
-        buildings = await d3.csv("full_years.csv");
-
-        mappings = await d3.csv("addr_to_mapbox.csv");
-
-        const ids = buildings.map((b) => getId(b, mappings));
-        let set = new Set(ids);
-        const uniqueIds = Array.from(set.values());
-
-        const array = ["match", ["get", "id"]];
-        for (let id of uniqueIds) {
-            if (id >= 0) {
-                array.push(id);
-                array.push("red");
-            }
-        }
-        array.push("blue");
-        console.log(array);
-        map.setPaintProperty("building", "fill-color", array);
     });
 
     let timelineProgress = 100;
