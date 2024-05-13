@@ -28,7 +28,7 @@
             (b) =>
                 b.ST_NUM === building.ST_NUM &&
                 b.ST_NAME === building.ST_NAME &&
-                parseInt(b.yr) === year
+                parseInt(b.yr) === year,
         );
         if (found) {
             return { id: found.mapboxid, percent: found.PercentChg };
@@ -69,7 +69,8 @@
             // Insert the layer beneath any symbol layer.
             const layers = map.getStyle().layers;
             const labelLayerId = layers.find(
-                (layer) => layer.type === "symbol" && layer.layout["text-field"]
+                (layer) =>
+                    layer.type === "symbol" && layer.layout["text-field"],
             ).id;
 
             // The 'building' layer in the Mapbox Streets
@@ -117,9 +118,11 @@
                             ],
                             ["get", "height"],
                         ],
+
+                        "fill-extrusion-opacity": 0.8,
                     },
                 },
-                labelLayerId
+                labelLayerId,
             );
         });
 
@@ -136,47 +139,47 @@
                 source: "composite",
                 sourceLayer: "building",
                 id: 818117637,
-            })
+            }),
         );
 
-        // let fHover;
+        let fHover;
 
-        // map.on("mousemove", function (e) {
-        //     var features = map.queryRenderedFeatures(e.point, {
-        //         layers: ["add-3d-buildings"],
-        //     });
-        //     //we will change pointer and color for 42455719
-        //     if (features[0]) {
-        //         mouseover(features[0]);
-        //     } else {
-        //         mouseout();
-        //     }
-        // });
+        map.on("mousemove", function (e) {
+            var features = map.queryRenderedFeatures(e.point, {
+                layers: ["add-3d-buildings"],
+            });
+            //we will change pointer and color for 42455719
+            if (features[0]) {
+                mouseover(features[0]);
+            } else {
+                mouseout();
+            }
+        });
 
-        // map.on("mouseout", function (e) {
-        //     mouseout();
-        // });
+        map.on("mouseout", function (e) {
+            mouseout();
+        });
 
-        // map.on("mouseout", function (e) {
-        //     mouseout();
-        // });
+        map.on("mouseout", function (e) {
+            mouseout();
+        });
 
-        // function mouseover(feature) {
-        //     fHover = feature;
-        //     // console.log(fHover.id);
-        //     map.getCanvasContainer().style.cursor = "pointer";
+        function mouseover(feature) {
+            fHover = feature;
+            console.log(fHover.id);
+            map.getCanvasContainer().style.cursor = "pointer";
 
-        //     map.setFeatureState(
-        //         {
-        //             source: fHover.source,
-        //             sourceLayer: fHover.sourceLayer,
-        //             id: fHover.id,
-        //         },
-        //         {
-        //             hover: true,
-        //         },
-        //     );
-        // }
+            map.setFeatureState(
+                {
+                    source: fHover.source,
+                    sourceLayer: fHover.sourceLayer,
+                    id: fHover.id,
+                },
+                {
+                    hover: true,
+                },
+            );
+        }
 
         timelineData = await d3.json("One Dalton.json");
         timelineData.forEach((row) => {
@@ -196,12 +199,12 @@
         });
 
         const buildingInfos = buildings.map((b) =>
-            getInfo(b, mappings, mapMaxtime)
+            getInfo(b, mappings, mapMaxtime),
         );
         const uniqueInfos = removeDuplicates(buildingInfos);
         if (uniqueInfos?.length > 0) {
             const allPercentages = mappings.map((m) =>
-                parseFloat(m.PercentChg)
+                parseFloat(m.PercentChg),
             );
             const minPercent = Math.min(...allPercentages);
             const maxPercent = Math.max(...allPercentages);
@@ -217,15 +220,15 @@
 
                 const redLevel = parseInt(
                     (adjValue * (redRange[1] - redRange[0])) / srcMax +
-                        redRange[0]
+                        redRange[0],
                 );
                 const greenLevel = parseInt(
                     (adjValue * (greenRange[1] - greenRange[0])) / srcMax +
-                        greenRange[0]
+                        greenRange[0],
                 );
                 const blueLevel = parseInt(
                     (adjValue * (blueRange[1] - blueRange[0])) / srcMax +
-                        blueRange[0]
+                        blueRange[0],
                 );
 
                 map.setFeatureState(
@@ -240,7 +243,7 @@
                         redLevel: redLevel,
                         greenLevel: greenLevel,
                         blueLevel: blueLevel,
-                    }
+                    },
                 );
             }
 
@@ -265,7 +268,7 @@
                     greenLevel: 39,
                     blueLevel: 255,
                     heightLevel: heightLevel, // reactive from 2017 to 2019
-                }
+                },
             );
         }
     }
@@ -282,7 +285,7 @@
                         return (
                             new Date(building.Year).getFullYear() === prevYear
                         );
-                    }
+                    },
                 );
 
                 const prevYearBuilding = filteredBuildingsPrevYear.find(
@@ -291,7 +294,7 @@
                             prevBuilding.ST_NUM === building.ST_NUM &&
                             prevBuilding.ST_NAME === building.ST_NAME
                         );
-                    }
+                    },
                 );
                 if (
                     prevYearBuilding !== undefined &&
@@ -302,10 +305,10 @@
                     const percentChange =
                         ((parseInt(building.TOTAL_VALUE.replace(/,/g, "")) -
                             parseInt(
-                                prevYearBuilding.TOTAL_VALUE.replace(/,/g, "")
+                                prevYearBuilding.TOTAL_VALUE.replace(/,/g, ""),
                             )) /
                             parseInt(
-                                prevYearBuilding.TOTAL_VALUE.replace(/,/g, "")
+                                prevYearBuilding.TOTAL_VALUE.replace(/,/g, ""),
                             )) *
                         100;
                     building.percentChange = percentChange;
