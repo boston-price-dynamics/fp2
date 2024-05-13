@@ -193,52 +193,52 @@
 
         map.scrollZoom.disable();
 
-        console.log(
-            map.getFeatureState({
-                source: "composite",
-                sourceLayer: "building",
-                id: 818117637,
-            }),
-        );
+        // console.log(
+        //     map.getFeatureState({
+        //         source: "composite",
+        //         sourceLayer: "building",
+        //         id: 818117637,
+        //     }),
+        // );
 
-        let fHover;
+        // let fHover;
 
-        map.on("mousemove", function (e) {
-            var features = map.queryRenderedFeatures(e.point, {
-                layers: ["add-3d-buildings"],
-            });
-            //we will change pointer and color for 42455719
-            if (features[0]) {
-                mouseover(features[0]);
-            } else {
-                mouseout();
-            }
-        });
+        // map.on("mousemove", function (e) {
+        //     var features = map.queryRenderedFeatures(e.point, {
+        //         layers: ["add-3d-buildings"],
+        //     });
+        //     //we will change pointer and color for 42455719
+        //     if (features[0]) {
+        //         mouseover(features[0]);
+        //     } else {
+        //         mouseout();
+        //     }
+        // });
 
-        map.on("mouseout", function (e) {
-            mouseout();
-        });
+        // map.on("mouseout", function (e) {
+        //     mouseout();
+        // });
 
-        map.on("mouseout", function (e) {
-            mouseout();
-        });
+        // map.on("mouseout", function (e) {
+        //     mouseout();
+        // });
 
-        function mouseover(feature) {
-            fHover = feature;
-            console.log(fHover.id);
-            map.getCanvasContainer().style.cursor = "pointer";
+        // function mouseover(feature) {
+        //     fHover = feature;
+        //     console.log(fHover.id);
+        //     map.getCanvasContainer().style.cursor = "pointer";
 
-            map.setFeatureState(
-                {
-                    source: fHover.source,
-                    sourceLayer: fHover.sourceLayer,
-                    id: fHover.id,
-                },
-                {
-                    hover: true,
-                },
-            );
-        }
+        //     map.setFeatureState(
+        //         {
+        //             source: fHover.source,
+        //             sourceLayer: fHover.sourceLayer,
+        //             id: fHover.id,
+        //         },
+        //         {
+        //             hover: true,
+        //         },
+        //     );
+        // }
 
         timelineData = await d3.json("One Dalton.json");
         timelineData.forEach((row) => {
