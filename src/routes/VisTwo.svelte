@@ -13,7 +13,8 @@
     let buildings = [];
     let mappings = [];
     let filteredBuildings;
-    let features;
+    let mapMaxtime = 2013;
+    let timelineProgress = 100;
 
     function getCoords(building) {
         let lat = building.lat;
@@ -22,10 +23,12 @@
         let { x, y } = map.project(point);
         return { cx: x, cy: y };
     }
-    function getId(building, mappings) {
+    function getInfo(building, mappings, year) {
         const found = mappings.find(
             (b) =>
-                b.ST_NUM === building.ST_NUM && b.ST_NAME === building.ST_NAME
+                b.ST_NUM === building.ST_NUM &&
+                b.ST_NAME === building.ST_NAME &&
+                parseInt(b.yr) === year
         );
         if (found) {
             return { id: found.mapboxid, percent: found.PercentChg };
@@ -36,7 +39,9 @@
         const obj = {};
 
         for (let i = 0, len = arr.length; i < len; i++) {
-            obj[arr[i]["id"]] = arr[i];
+            if (arr[i]["id"] >= 0) {
+                obj[arr[i]["id"]] = arr[i];
+            }
         }
 
         const newArr = new Array();
@@ -60,24 +65,6 @@
             // dragPan: false,
         });
 
-        buildings = await d3.csv("full_years.csv");
-
-        mappings = await d3.csv("vistwo.csv");
-
-        const ids = buildings.map((b) => getId(b, mappings));
-        const uniqueIds = removeDuplicates(ids);
-        console.log(uniqueIds);
-
-        const colorArray = ["interpolate", ["linear"], ["get", "id"]];
-        const opacityArray = ["interpolate", ["linear"], ["get", "id"]];
-        for (let id of uniqueIds) {
-            if (id >= 0) {
-                colorArray.push(id);
-                colorArray.push("red");
-            }
-        }
-        array.push(false);
-
         map.on("style.load", () => {
             // Insert the layer beneath any symbol layer.
             const layers = map.getStyle().layers;
@@ -100,7 +87,12 @@
                         "fill-extrusion-color": [
                             "case",
                             ["boolean", ["feature-state", "hover"], false],
-                            ["rgb", ["feature-state", "temperature"], 0, 0],
+                            [
+                                "rgb",
+                                ["feature-state", "redLevel"],
+                                ["feature-state", "greenLevel"],
+                                ["feature-state", "blueLevel"],
+                            ],
                             "#ddd",
                         ],
 
@@ -108,47 +100,22 @@
                         // add a smooth transition effect to
                         // the buildings as the user zooms in.
                         "fill-extrusion-height": [
-                            "interpolate",
-                            ["linear"],
-                            ["zoom"], // for one dalton, animate the height from 2017 to 2019
-                            15,
-                            0,
-                            15.05,
-                            ["get", "height"], // retrieve the correct height (full height)
-                        ],
-                        "fill-extrusion-base": [
-                            "interpolate",
-                            ["linear"],
-                            ["zoom"],
-                            15,
-                            0,
-                            15.05,
-                            ["get", "min_height"],
-                        ],
-                        "fill-extrusion-opacity": [
-                            "interpolate",
-                            ["linear"],
-                            ["get", "id"],
-                            1,
-                            "#fff7ec",
-                            1.5,
-                            "#fee8c8",
-                            2,
-                            "#fdd49e",
-                            2.5,
-                            "#fdbb84",
-                            3,
-                            "#fc8d59",
-                            3.5,
-                            "#ef6548",
-                            4.5,
-                            "#d7301f",
-                            6.5,
-                            "#b30000",
-                            8.5,
-                            "#7f0000",
-                            10.5,
-                            "#000",
+                            "case",
+                            [
+                                "boolean",
+                                ["feature-state", "heightChanged"],
+                                false,
+                            ],
+                            [
+                                "interpolate",
+                                ["linear"],
+                                ["feature-state", "heightLevel"],
+                                0,
+                                0,
+                                1,
+                                ["get", "height"],
+                            ],
+                            ["get", "height"],
                         ],
                     },
                 },
@@ -157,40 +124,17 @@
         });
 
         await new Promise((resolve) => map.on("load", resolve));
-        // map.scrollZoom.disable();
-<<<<<<< HEAD
-        // map.setFeatureState(
-        //     {
-        //         source: "composite",
-        //         sourceLayer: "building",
-        //         id: 818117637,
-        //     },
-        //     {
-        //         hover: true,
-        //     }
-        // );
-=======
-        map.setFeatureState(
-            {
-                source: "composite",
-                sourceLayer: "building",
-                id: 818117637,
-            },
-            {
-                hover: true,
-                temperature: 100,
-                onedaltonheight: {}, // reactive from 2017 to 2019
-            },
-        );
+
+        buildings = await d3.csv("full_years.csv");
+        mappings = await d3.csv("vistwo.csv");
 
         console.log(
             map.getFeatureState({
                 source: "composite",
                 sourceLayer: "building",
                 id: 818117637,
-            }),
+            })
         );
->>>>>>> 10b3e399762f61bb0c842373c92e283fde2a353c
 
         // let fHover;
 
@@ -237,8 +181,6 @@
         });
     });
 
-    let timelineProgress = 100;
-    let mapMaxtime = 2013;
     $: timeScale = d3
         .scaleTime()
         .domain(d3.extent(timelineData, (evt) => evt.dt))
@@ -250,33 +192,80 @@
             return new Date(building.Year).getFullYear() === mapMaxtime;
         });
 
-        const allIds = buildings.map((building) => getId(building, mappings));
-        const idsToColor = filteredBuildings.map((building) =>
-            getId(building, mappings)
+        const buildingInfos = buildings.map((b) =>
+            getInfo(b, mappings, mapMaxtime)
         );
+        const uniqueInfos = removeDuplicates(buildingInfos);
+        if (uniqueInfos?.length > 0) {
+            const allPercentages = mappings.map((m) =>
+                parseFloat(m.PercentChg)
+            );
+            const minPercent = Math.min(...allPercentages);
+            const maxPercent = Math.max(...allPercentages);
 
-        // // reset color
-        // for (let id of allIds) {
-        //     map.removeFeatureState({
-        //         source: "composite",
-        //         sourceLayer: "building",
-        //         id: id,
-        //     });
-        // }
+            // map.scrollZoom.disable();
+            for (let buildingInfo of uniqueInfos) {
+                const redRange = [255, 215];
+                const greenRange = [255, 48];
+                const blueRange = [255, 39];
 
-        // // set color for filtered buildings
-        // for (let id of idsToColor) {
-        //     map.setFeatureState(
-        //         {
-        //             source: "composite",
-        //             sourceLayer: "building",
-        //             id: id,
-        //         },
-        //         {
-        //             hover: true,
-        //         }
-        //     );
-        // }
+                const srcMax = maxPercent - minPercent,
+                    adjValue = buildingInfo.percent - minPercent;
+
+                const redLevel = parseInt(
+                    (adjValue * (redRange[1] - redRange[0])) / srcMax +
+                        redRange[0]
+                );
+                const greenLevel = parseInt(
+                    (adjValue * (greenRange[1] - greenRange[0])) / srcMax +
+                        greenRange[0]
+                );
+                const blueLevel = parseInt(
+                    (adjValue * (blueRange[1] - blueRange[0])) / srcMax +
+                        blueRange[0]
+                );
+
+                map.setFeatureState(
+                    {
+                        source: "composite",
+                        sourceLayer: "building",
+                        id: buildingInfo.id,
+                    },
+                    {
+                        hover: true,
+                        isMarked: true,
+                        redLevel: redLevel,
+                        greenLevel: greenLevel,
+                        blueLevel: blueLevel,
+                    }
+                );
+            }
+
+            // one dalton
+            const heightRange = [0, 1];
+
+            const srcMax = 2019 - 2010,
+                adjValue = mapMaxtime - 2010;
+            const heightLevel = parseInt(
+                (adjValue * (heightRange[1] - heightRange[0])) / srcMax
+            );
+
+            map.setFeatureState(
+                {
+                    source: "composite",
+                    sourceLayer: "building",
+                    id: 818117637,
+                },
+                {
+                    hover: true,
+                    heightChanged: true,
+                    redLevel: 255,
+                    greenLevel: 39,
+                    blueLevel: 255,
+                    heightLevel: heightLevel, // reactive from 2017 to 2019
+                }
+            );
+        }
     }
     let colorScale = d3
         .scaleLinear()
